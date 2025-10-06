@@ -16,7 +16,7 @@ export default function Viewer() {
       const options = {
         env: "AutodeskProduction",
         getAccessToken: async (onSuccess) => {
-          // Busca token do backend também (melhor prática seria expor um /token separado)
+          // Busca token do backend também
           const tokenResp = await fetch("http://localhost:3000/api/token");
           const tokenData = await tokenResp.json();
           onSuccess(tokenData.access_token, tokenData.expires_in);
@@ -32,6 +32,22 @@ export default function Viewer() {
           (doc) => {
             const defaultModel = doc.getRoot().getDefaultGeometry();
             viewer.loadDocumentNode(doc, defaultModel);
+
+            // ✅ Aguarda o modelo carregar completamente antes de configurar a câmera
+            viewer.addEventListener(Autodesk.Viewing.GEOMETRY_LOADED_EVENT, () => {
+              console.log("Modelo carregado com sucesso!");''
+
+              // 🔥 Define manualmente a posição e alvo da câmera
+              const position = new THREE.Vector3(50, 50, 40); // posição da câmera
+              const target = new THREE.Vector3(0, 50, 0); // ponto para onde ela olha
+              const up = new THREE.Vector3(0, 1, 0); // eixo "para cima"
+
+              viewer.navigation.setView(position, target);
+              viewer.navigation.setWorldUpVector(up, true);
+              viewer.navigation.fitBounds(false);
+
+              console.log("Câmera ajustada manualmente.");
+            });
           },
           (err) => console.error("Erro ao carregar documento:", err)
         );

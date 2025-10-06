@@ -139,7 +139,7 @@ async function uploadFile(token) {
 }
 
 // documentação de como fazer a tradução:
-// 
+// https://aps.autodesk.com/en/docs/model-derivative/v2/developers_guide/basics/preperation/
 // 4. Iniciar tradução para SVF
 async function translateFile(token, objectId) {
   console.log("Iniciando tradução...");

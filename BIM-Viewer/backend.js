@@ -7,6 +7,7 @@ import cors from "cors";
 
 const app = express();
 const port = 3000;
+let token = null;
 dotenv.config();
 
 app.use(cors({
@@ -19,7 +20,7 @@ const client_secret = process.env.CLIENT_SECRET;
 
 // 1. Função para gerar token (2-legged OAuth)
 // documentação de como pegar o token: https://aps.autodesk.com/en/docs/oauth/v2/tutorials/get-2-legged-token/
-async function getToken() {
+async function createToken() {
   console.log("Pegando o token...");
 
   // Converte para Base64 → client_id:client_secret
@@ -184,7 +185,7 @@ async function checkTranslationStatus(token, urn) {
 // 6. Endpoint que retorna o URN
 app.get("/urn", async (req, res) => {
   try {
-    const token = await getToken();
+    token = await createToken();
     await createBucket(token);
     const result = await uploadFile(token);
     const urn = await translateFile(token, result.objectId);
@@ -194,6 +195,11 @@ app.get("/urn", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Erro ao processar arquivo" });
   }
+});
+
+// 7. Endpoint para retornar token (usado pelo Viewer React)
+app.get("/api/token", async (req, res) => {
+  res.json(token);
 });
 
 async function safeJson(resp) {

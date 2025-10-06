@@ -17,7 +17,7 @@ export default function Viewer() {
         env: "AutodeskProduction",
         getAccessToken: async (onSuccess) => {
           // Busca token do backend também (melhor prática seria expor um /token separado)
-          const tokenResp = await fetch("http://localhost:3000/urn"); 
+          const tokenResp = await fetch("http://localhost:3000/api/token");
           const tokenData = await tokenResp.json();
           onSuccess(tokenData.access_token, tokenData.expires_in);
         },

@@ -1,4 +1,5 @@
 // backend.js
+import multer from "multer";
 import express from "express";
 import fetch from "node-fetch";
 import fs from "fs";
@@ -211,5 +212,90 @@ async function safeJson(resp) {
     throw new Error("Falha na requisição: " + resp.url);
   }
 }
+
+const upload = multer({ dest: "uploads/" });
+
+// 📸 Upload da screenshot para Autodesk OSS via signed URL
+app.post("/upload-screenshot", upload.single("screenshot"), async (req, res) => {
+  try {
+    const bucketKey = "meu-bucket-rvt";
+    const objectKey = `screenshot_${Date.now()}.png`; // nome único
+    const fileBuffer = fs.readFileSync(req.file.path);
+
+    // 1️⃣ Cria token (ou usa existente)
+    const token = await createToken();
+
+    // 2️⃣ Pede URL assinada para upload
+    const signedResp = await fetch(
+      `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${objectKey}/signeds3upload?minutesExpiration=5`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token.access_token}` },
+      }
+    );
+
+    if (!signedResp.ok) {
+      const errText = await signedResp.text();
+      throw new Error(`Erro ao gerar signed URL: ${signedResp.status} - ${errText}`);
+    }
+
+    const signedData = await signedResp.json();
+    const signedUrl = signedData.urls[0];
+    const uploadKey = signedData.uploadKey;
+
+    // 3️⃣ Faz o upload da imagem via PUT na URL assinada
+    const uploadResp = await fetch(signedUrl, {
+      method: "PUT",
+      headers: { "Content-Type": "image/png" },
+      body: fileBuffer,
+    });
+
+    if (!uploadResp.ok) {
+      const errText = await uploadResp.text();
+      throw new Error(`Erro no upload: ${uploadResp.status} - ${errText}`);
+    }
+
+    const eTag = uploadResp.headers.get("etag").replace(/"/g, "");
+
+    // 4️⃣ Confirma o upload (POST)
+    const completeResp = await fetch(
+      `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${objectKey}/signeds3upload`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token.access_token}`,
+          "Content-Type": "application/json",
+          "x-ads-meta-Content-Type": "image/png",
+        },
+        body: JSON.stringify({
+          uploadKey,
+          size: fileBuffer.length,
+          eTags: [eTag],
+        }),
+      }
+    );
+
+    const completeData = await completeResp.json();
+
+    if (!completeResp.ok) {
+      throw new Error(`Erro ao completar upload: ${completeResp.status} - ${JSON.stringify(completeData)}`);
+    }
+
+    fs.unlinkSync(req.file.path); // apaga o arquivo local
+
+    console.log("✅ Screenshot salva com sucesso:", completeData);
+
+    // Retorna o ID ou URL do arquivo salvo
+    res.json({
+      success: true,
+      objectId: completeData.objectId,
+      bucketKey: completeData.bucketKey,
+      objectKey: completeData.objectKey,
+    });
+  } catch (err) {
+    console.error("❌ Erro ao enviar screenshot:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.listen(port, () => console.log(`✅ Servidor rodando em http://localhost:${port}`));

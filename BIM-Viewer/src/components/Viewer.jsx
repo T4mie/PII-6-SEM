@@ -1,22 +1,20 @@
 // src/components/Viewer.jsx
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Viewer() {
   const viewerDiv = useRef(null);
+  const [screenshotUrl, setScreenshotUrl] = useState(null);
   let viewer;
 
   useEffect(() => {
     async function init() {
-      // Busca o URN do backend
       const resp = await fetch("http://localhost:3000/urn");
       const data = await resp.json();
       const myUrn = data.urn;
 
-      // Inicializa o viewer
       const options = {
         env: "AutodeskProduction",
         getAccessToken: async (onSuccess) => {
-          // Busca token do backend também
           const tokenResp = await fetch("http://localhost:3000/api/token");
           const tokenData = await tokenResp.json();
           onSuccess(tokenData.access_token, tokenData.expires_in);
@@ -32,22 +30,6 @@ export default function Viewer() {
           (doc) => {
             const defaultModel = doc.getRoot().getDefaultGeometry();
             viewer.loadDocumentNode(doc, defaultModel);
-
-            // ✅ Aguarda o modelo carregar completamente antes de configurar a câmera
-            viewer.addEventListener(Autodesk.Viewing.GEOMETRY_LOADED_EVENT, () => {
-              console.log("Modelo carregado com sucesso!");''
-
-              // 🔥 Define manualmente a posição e alvo da câmera
-              const position = new THREE.Vector3(50, 50, 40); // posição da câmera
-              const target = new THREE.Vector3(0, 50, 0); // ponto para onde ela olha
-              const up = new THREE.Vector3(0, 1, 0); // eixo "para cima"
-
-              viewer.navigation.setView(position, target);
-              viewer.navigation.setWorldUpVector(up, true);
-              viewer.navigation.fitBounds(false);
-
-              console.log("Câmera ajustada manualmente.");
-            });
           },
           (err) => console.error("Erro ao carregar documento:", err)
         );
@@ -64,21 +46,40 @@ export default function Viewer() {
     };
   }, []);
 
-  // Botão Explode (React)
-  function toggleExplode() {
+  async function takeScreenshot() {
     if (!viewer) return;
-    if (viewer.getExplodeScale() > 0.0) {
-      viewer.explode(0.0);
-    } else {
-      viewer.explode(0.5);
-    }
+    
+    // Captura imagem como base64
+    viewer.getScreenShot(1600, 900, async (blobURL) => {
+      const blob = await fetch(blobURL).then((res) => res.blob());
+      const formData = new FormData();
+      formData.append("screenshot", blob, "screenshot.png");
+
+      // Envia para o backend
+      const uploadResp = await fetch("http://localhost:3000/upload-screenshot", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await uploadResp.json();
+      setScreenshotUrl(data.url); // URL pública do bucket
+    });
   }
 
   return (
-    <div className="viewer-container">
-      <div ref={viewerDiv} className="viewer" />
+    <div>
       <div className="overlay">
-        <button onClick={toggleExplode}>Explode</button>
+          <img src={screenshotUrl} alt="Screenshot" style={{ maxWidth: "90%", borderRadius: "8px" }} />
+        </div>
+      <div className="viewer-container">
+        <div ref={viewerDiv} className="viewer" />
+        
+        {screenshotUrl && (
+          <div className="screenshot-preview">
+            <h3>Screenshot salva no bucket:</h3>
+            <img src={screenshotUrl} alt="Screenshot" style={{ maxWidth: "100%" }} />
+          </div>
+        )}
       </div>
     </div>
   );

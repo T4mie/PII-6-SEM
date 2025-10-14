@@ -1,0 +1,27 @@
+.container {
+    display: flex;              
+    flex-direction: row;         
+    justify-content: center;     
+    align-items: center;         
+    width: 100vw;
+    height: 100vh;
+}
+
+.collum {
+    flex: 6;
+    background: rgba(255, 255, 255, 0.44);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    height: 80vh;
+    border-radius: 12px;
+    opacity: 0.5;
+    margin: 10px;                
+}
+.collum:hover{
+
+    box-shadow: 0 0 20px rgb(0, 0, 0);
+}
+
+.divisor{
+    flex: 1;
+}

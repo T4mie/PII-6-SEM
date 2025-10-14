@@ -77,13 +77,14 @@ export default function Viewer() {
         <div ref={viewerDiv} className="viewer" />
       </div>
       <div className="overlay">
-        <input
+        
+      </div>
+      <input
           type="file"
           accept="image/*"
           onChange={handleImageUpload}
           style={{ marginLeft: "10px" }}
         />
-      </div>
 
       {/* Mostrar imagem enviada */}
       {imageUrl && (

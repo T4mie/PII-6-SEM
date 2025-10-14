@@ -4,11 +4,15 @@ import fetch from "node-fetch";
 import fs from "fs";
 import dotenv from "dotenv";
 import cors from "cors";
+import multer from "multer";
 
 const app = express();
 const port = 3000;
 let token = null;
 dotenv.config();
+
+// Configuração para uploads temporários no servidor
+const upload = multer({ dest: "uploads/" });
 
 app.use(cors({
   origin: "http://localhost:5173"
@@ -53,7 +57,7 @@ async function createBucket(token) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      bucketKey: "meu-bucket-rvt",
+      bucketKey: "meu-bucket",
       policyKey: "persistent"
     })
   });
@@ -74,7 +78,7 @@ async function createBucket(token) {
 async function uploadFile(token) {
   console.log("Fazendo upload do arquivo...");
 
-  const bucketKey = "meu-bucket-rvt";
+  const bucketKey = "meu-bucket";
   const objectKey = "meu_arquivo.rvt";
 
   // 1. Pedir URL assinada para upload
@@ -138,6 +142,78 @@ async function uploadFile(token) {
   return completeData;
 }
 
+// Função auxiliar para upload da imagem
+async function uploadImage(token, filePath) {
+  console.log("Iniciando upload da imagem...");
+
+  const bucketKey = "meu-bucket"
+  const objectKey = "minha_imagem.jpg"
+
+  // 1. Obter URL assinada
+  const signedResp = await fetch(
+    `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${objectKey}/signeds3upload`,
+    {
+      method: "GET",
+      headers: { "Authorization": `Bearer ${token.access_token}` },
+    }
+  );
+
+  const signedData = await signedResp.json();
+  const uploadKey = signedData.uploadKey;
+  console.log("Signed URL recebido:", signedData);
+
+  if (!signedData.urls || signedData.urls.length === 0) {
+    throw new Error("Não foi possível obter a URL assinada para upload.");
+  }
+
+  const signedUrl = signedData.urls[0]; // single-part upload
+
+  // 2️. Upload da imagem para S3
+  const file = fs.readFileSync(filePath);
+  const uploadResp = await fetch(signedUrl, {
+    method: "PUT",
+    headers: { "Content-Type": "image/jpeg" },
+    body: file,
+  });
+
+  if (!uploadResp.ok) {
+    const errText = await uploadResp.text();
+    throw new Error(`Falha no upload para S3: ${uploadResp.status} - ${errText}`);
+  }
+
+  // Capturar o eTag retornado pelo S3
+  const eTag = uploadResp.headers.get("etag");
+  console.log("ETag retornado pelo S3:", eTag);
+
+  // 3️. Confirmar upload no OSS
+  const completeResp = await fetch(
+    `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${objectKey}/signeds3upload`,
+    {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token.access_token}`,
+        "Content-Type": "application/json",
+        "x-ads-meta-Content-Type": "image/jpeg"
+      },
+      body: JSON.stringify({
+        uploadKey,
+        size: file.length,
+        eTags: [eTag.replace(/"/g, "")]
+      })
+    }
+  );
+
+  const completeData = await completeResp.json();
+
+  console.log("Upload completo:", completeData);
+
+  // Gerar base64 para visualização rápida no front
+  const base64 = file.toString("base64");
+  const dataUrl = `data:image/jpeg;base64,${base64}`;
+
+  return { ossData: completeData, imageUrl: dataUrl };
+}
+
 // documentação de como fazer a tradução:
 // https://aps.autodesk.com/en/docs/model-derivative/v2/developers_guide/basics/preperation/
 // 4. Iniciar tradução para SVF
@@ -168,7 +244,6 @@ async function checkTranslationStatus(token, urn) {
   );
 
   const data = await resp.json();
-  console.log("Manifesto da tradução:", JSON.stringify(data, null, 2));
 
   if (data.status === "success") {
     console.log("✅ Tradução concluída com sucesso!");
@@ -200,6 +275,24 @@ app.get("/urn", async (req, res) => {
 // 7. Endpoint para retornar token (usado pelo Viewer React)
 app.get("/api/token", async (req, res) => {
   res.json(token);
+});
+
+// Endpoint que recebe o upload da imagem e envia para o Autodesk
+app.post("/upload/image", upload.single("file"), async (req, res) => {
+  try {
+
+    // Faz upload da imagem
+    const result = await uploadImage(token, req.file.path);
+
+    // Remove arquivo temporário
+    fs.unlinkSync(req.file.path);
+
+    // Retorna URL de exibição
+    res.json(result);
+  } catch (err) {
+    console.error("DEU ERROOOO", err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 async function safeJson(resp) {

@@ -1,8 +1,9 @@
 // src/components/Viewer.jsx
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Viewer() {
   const viewerDiv = useRef(null);
+  const [imageUrl, setImageUrl] = useState(null);
   let viewer;
 
   useEffect(() => {
@@ -32,22 +33,6 @@ export default function Viewer() {
           (doc) => {
             const defaultModel = doc.getRoot().getDefaultGeometry();
             viewer.loadDocumentNode(doc, defaultModel);
-
-            // ✅ Aguarda o modelo carregar completamente antes de configurar a câmera
-            viewer.addEventListener(Autodesk.Viewing.GEOMETRY_LOADED_EVENT, () => {
-              console.log("Modelo carregado com sucesso!");''
-
-              // 🔥 Define manualmente a posição e alvo da câmera
-              const position = new THREE.Vector3(50, 50, 40); // posição da câmera
-              const target = new THREE.Vector3(0, 50, 0); // ponto para onde ela olha
-              const up = new THREE.Vector3(0, 1, 0); // eixo "para cima"
-
-              viewer.navigation.setView(position, target);
-              viewer.navigation.setWorldUpVector(up, true);
-              viewer.navigation.fitBounds(false);
-
-              console.log("Câmera ajustada manualmente.");
-            });
           },
           (err) => console.error("Erro ao carregar documento:", err)
         );
@@ -64,22 +49,58 @@ export default function Viewer() {
     };
   }, []);
 
-  // Botão Explode (React)
-  function toggleExplode() {
-    if (!viewer) return;
-    if (viewer.getExplodeScale() > 0.0) {
-      viewer.explode(0.0);
+  // Upload de imagem
+  async function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const resp = await fetch("http://localhost:3000/upload/image", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await resp.json();
+    if (data.imageUrl) {
+      setImageUrl(data.imageUrl);
+      console.log("Imagem enviada e recebida:", data.imageUrl);
     } else {
-      viewer.explode(0.5);
+      console.error("Falha no upload da imagem", data);
     }
   }
 
   return (
-    <div className="viewer-container">
-      <div ref={viewerDiv} className="viewer" />
-      <div className="overlay">
-        <button onClick={toggleExplode}>Explode</button>
+    <div>
+      <div className="viewer-container">
+        <div ref={viewerDiv} className="viewer" />
       </div>
+      <div className="overlay">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          style={{ marginLeft: "10px" }}
+        />
+      </div>
+
+      {/* Mostrar imagem enviada */}
+      {imageUrl && (
+        <div style={{ marginTop: "15px", textAlign: "center" }}>
+          <h4>Imagem enviada:</h4>
+          <img
+            src={imageUrl}
+            alt="Preview"
+            style={{
+              maxWidth: "400px",
+              borderRadius: "10px",
+              boxShadow: "0 0 10px rgba(0,0,0,0.3)",
+            }}
+          />
+        </div>
+      )}
     </div>
+
   );
 }

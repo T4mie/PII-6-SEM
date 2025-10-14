@@ -8,20 +8,34 @@
 }
 
 .collum {
-    flex: 6;
-    background: rgba(255, 255, 255, 0.44);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.02);
-    height: 80vh;
-    border-radius: 12px;
-    opacity: 0.5;
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;     
+    align-items: center; 
+    height: 64vh;
     margin: 10px;                
 }
-.collum:hover{
 
-    box-shadow: 0 0 20px rgb(0, 0, 0);
+.collum div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    outline-style: dashed;
+    outline-color: rgb(125, 125, 125);
+    width: 100%;
+    height: 800px;
+}
+
+.collum div button {
+    background-color: aliceblue;
+}
+
+.collum div:hover{
+    cursor: pointer;
 }
 
 .divisor{
     flex: 1;
 }
+

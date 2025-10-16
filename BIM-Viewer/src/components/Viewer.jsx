@@ -3,53 +3,53 @@ import { useEffect, useRef, useState } from "react";
 
 export default function Viewer() {
   const viewerDiv = useRef(null);
+  const [viewer, setViewer] = useState(null);
+  const [urn, setUrn] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
-  let viewer;
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Inicializa o viewer (sem carregar modelo ainda)
   useEffect(() => {
-    async function init() {
-      // Busca o URN do backend
-      const resp = await fetch("http://localhost:3000/urn");
-      const data = await resp.json();
-      const myUrn = data.urn;
+    const options = {
+      env: "AutodeskProduction",
+      getAccessToken: async (onSuccess) => {
+        const tokenResp = await fetch("http://localhost:3000/start");
+        const tokenData = await tokenResp.json();
+        onSuccess(tokenData.access_token, tokenData.expires_in);
+      },
+    };
 
-      // Inicializa o viewer
-      const options = {
-        env: "AutodeskProduction",
-        getAccessToken: async (onSuccess) => {
-          // Busca token do backend também
-          const tokenResp = await fetch("http://localhost:3000/api/token");
-          const tokenData = await tokenResp.json();
-          onSuccess(tokenData.access_token, tokenData.expires_in);
-        },
-      };
-
-      Autodesk.Viewing.Initializer(options, () => {
-        viewer = new Autodesk.Viewing.GuiViewer3D(viewerDiv.current);
-        viewer.start();
-
-        Autodesk.Viewing.Document.load(
-          "urn:" + myUrn,
-          (doc) => {
-            const defaultModel = doc.getRoot().getDefaultGeometry();
-            viewer.loadDocumentNode(doc, defaultModel);
-          },
-          (err) => console.error("Erro ao carregar documento:", err)
-        );
-      });
-    }
-
-    init();
+    Autodesk.Viewing.Initializer(options, () => {
+      const newViewer = new Autodesk.Viewing.GuiViewer3D(viewerDiv.current);
+      newViewer.start();
+      setViewer(newViewer);
+      console.log("Viewer inicializado!");
+    });
 
     return () => {
       if (viewer) {
         viewer.finish();
-        viewer = null;
+        console.log("Viewer encerrado.");
       }
     };
   }, []);
 
-  // Upload de imagem
+  // Quando o URN for definido, carrega o modelo no viewer
+  useEffect(() => {
+    if (!viewer || !urn) return;
+
+    Autodesk.Viewing.Document.load(
+      "urn:" + urn,
+      (doc) => {
+        const defaultModel = doc.getRoot().getDefaultGeometry();
+        viewer.loadDocumentNode(doc, defaultModel);
+        console.log("Modelo carregado com sucesso!");
+      },
+      (err) => console.error("Erro ao carregar documento:", err)
+    );
+  }, [urn, viewer]);
+
+  // Upload de imagem (já existia)
   async function handleImageUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -65,30 +65,79 @@ export default function Viewer() {
     const data = await resp.json();
     if (data.imageUrl) {
       setImageUrl(data.imageUrl);
-      console.log("Imagem enviada e recebida:", data.imageUrl);
+      console.log("Imagem enviada:", data.imageUrl);
     } else {
-      console.error("Falha no upload da imagem", data);
+      console.error("Falha no upload da imagem:", data);
+    }
+  }
+
+  // Upload do arquivo RVT (novo)
+  async function handleFileUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsLoading(true);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      console.log("Enviando arquivo RVT:", file.name);
+
+      const resp = await fetch("http://localhost:3000/upload/file", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await resp.json();
+
+      if (data.urn) {
+        console.log("Upload concluído, URN recebido:", data.urn);
+        setUrn(data.urn);
+      } else {
+        console.error("Erro no upload:", data);
+      }
+    } catch (err) {
+      console.error("Erro ao enviar arquivo:", err);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   return (
-    <div>
-      <div className="viewer-container">
-        <div ref={viewerDiv} className="viewer" />
+    <div style={{ textAlign: "center" }}>
+      <div className="viewer-container" style={{ height: "600px", border: "1px solid #ccc" }}>
+        <div ref={viewerDiv} className="viewer" style={{ height: "100%", width: "100%" }} />
       </div>
-      <div className="overlay">
-        
+
+      <div className="upload-controls" style={{ marginTop: "20px" }}>
+        <label>
+          <strong>Enviar arquivo RVT:</strong>
+          <input
+            type="file"
+            accept=".rvt"
+            onChange={handleFileUpload}
+            disabled={isLoading}
+            style={{ marginLeft: "10px" }}
+          />
+        </label>
+
+        <label style={{ marginLeft: "30px" }}>
+          <strong>Enviar imagem:</strong>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            style={{ marginLeft: "10px" }}
+          />
+        </label>
+
+        {isLoading && <p style={{ marginTop: "10px" }}>Processando arquivo RVT...</p>}
       </div>
-      <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          style={{ marginLeft: "10px" }}
-        />
 
       {/* Mostrar imagem enviada */}
       {imageUrl && (
-        <div style={{ marginTop: "15px", textAlign: "center" }}>
+        <div style={{ marginTop: "25px" }}>
           <h4>Imagem enviada:</h4>
           <img
             src={imageUrl}
@@ -102,6 +151,5 @@ export default function Viewer() {
         </div>
       )}
     </div>
-
   );
 }

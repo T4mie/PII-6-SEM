@@ -1,20 +1,21 @@
 // src/backend/uploadFile.js
-
 import fetch from "node-fetch";
 import fs from "fs";
 
-// 3. Fazer upload do arquivo .rvt usando signed URL
-export async function uploadFile(token) {
-  console.log("Fazendo upload do arquivo...");
+export async function uploadFile(token, filePath) {
+  console.log("Fazendo upload do arquivo:", filePath);
 
   const bucketKey = "meu-bucket";
-  const objectKey = "meu_arquivo.rvt";
+  const objectKey = "meu-arquivo.rvt"; // usa o nome real do arquivo
 
+  console.log("Object Key:", objectKey);
+
+  // 1. Obter URL assinada
   const signedResp = await fetch(
     `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${objectKey}/signeds3upload`,
     {
       method: "GET",
-      headers: { "Authorization": `Bearer ${token.access_token}` },
+      headers: { Authorization: `Bearer ${token.access_token}` },
     }
   );
 
@@ -27,10 +28,12 @@ export async function uploadFile(token) {
   }
 
   const signedUrl = signedData.urls[0];
-  const file = fs.readFileSync("./racbasicsampleproject.rvt");
 
+  // 2. Upload para S3
+  const file = fs.readFileSync(filePath);
   const uploadResp = await fetch(signedUrl, {
     method: "PUT",
+    headers: { "Content-Type": "application/vnd.autodesk.rvt" },
     body: file
   });
 
@@ -39,11 +42,10 @@ export async function uploadFile(token) {
     throw new Error(`Falha no upload para S3: ${uploadResp.status} - ${errText}`);
   }
 
-  console.log("Upload feito com sucesso no S3 temporário!");
-
+  console.log("✅ Upload feito com sucesso no S3 temporário!");
   const eTag = uploadResp.headers.get("etag");
-  console.log("ETag retornado pelo S3:", eTag);
 
+  // 3. Confirmar upload no OSS
   const completeResp = await fetch(
     `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${objectKey}/signeds3upload`,
     {
@@ -54,7 +56,7 @@ export async function uploadFile(token) {
         "x-ads-meta-Content-Type": "application/vnd.autodesk.rvt"
       },
       body: JSON.stringify({
-        uploadKey: uploadKey,
+        uploadKey,
         size: file.length,
         eTags: [eTag.replace(/"/g, "")]
       })
@@ -63,6 +65,5 @@ export async function uploadFile(token) {
 
   const completeData = await completeResp.json();
   console.log("Upload completo confirmado no OSS:", completeData);
-
   return completeData;
 }

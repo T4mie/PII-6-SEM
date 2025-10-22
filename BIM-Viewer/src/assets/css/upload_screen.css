@@ -20,19 +20,32 @@
 .collum div{
     display: flex;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
     outline-style: dashed;
-    outline-color: rgb(125, 125, 125);
+    outline-color: white;
     width: 100%;
     height: 800px;
 }
 
-.collum div button {
-    background-color: aliceblue;
+.collum div:hover{
+    box-shadow: inset 0px 0px 31px 11px rgba(15, 15, 15, 0.32);
+   ;
+}
+.collum div:active{
+    box-shadow: inset 0px 0px 31px 11px rgba(0, 0, 0, 0.34);
+   ;
 }
 
-.collum div:hover{
+.collum div label{
+    width: 100%;
+    height: 100%;
+    z-index: 2;
     cursor: pointer;
+
+}
+.collum input{
+    display: none;
 }
 
 .divisor{

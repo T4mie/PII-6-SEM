@@ -6,7 +6,7 @@ import multer from "multer";
 import fs from "fs";
 
 // Importando funções modularizadas
-import { createToken } from "./src/backend/createToken.js";
+import { getToken } from "./src/backend/createToken.js";
 import { createBucket } from "./src/backend/createBucket.js";
 import { uploadFile } from "./src/backend/uploadFile.js";
 import { translateFile, checkTranslationStatus } from "./src/backend/translateFile.js";
@@ -29,18 +29,6 @@ const upload = multer({ dest: "uploads/" });
 
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
-
-app.get("/start", async (req, res) => {
-  try {
-    token = await createToken(client_id, client_secret);
-    await createBucket(token);
-    console.log("Token e bucket criados com sucesso!");
-    res.json(token);
-  } catch (err) {
-    console.error("Erro em /start:", err);
-    res.status(500).json({ error: "Erro ao criar token e bucket" });
-  }
-});
 
 app.get("/api/token", async (req, res) => {
   try {
@@ -90,6 +78,17 @@ app.post("/upload/file", upload.single("file"), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+(async () => {
+  try {
+    token = await getToken(client_id, client_secret);
+    await createBucket(token);
+    console.log("Token e bucket criados no startup do servidor!");
+  } catch (err) {
+    console.error("Falha ao criar token/bucket no início:", err);
+  }
+})();
+
 
 app.listen(port, () =>
   console.log(`Servidor rodando em http://localhost:${port}`)

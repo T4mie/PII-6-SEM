@@ -1,3 +1,7 @@
+// src/backend/translateFile.js
+
+// documentação de como fazer a tradução:
+// https://aps.autodesk.com/en/docs/model-derivative/v2/developers_guide/basics/preperation/
 import fetch from "node-fetch";
 
 // 4. Iniciar tradução para SVF
@@ -35,11 +39,11 @@ export async function checkTranslationStatus(token, urn) {
   const data = await resp.json();
 
   if (data.status === "success") {
-    console.log("✅ Tradução concluída com sucesso!");
+    console.log("Tradução concluída com sucesso!");
   } else if (data.status === "inprogress") {
-    console.log("⏳ Tradução em andamento...");
+    console.log("Tradução em andamento...");
   } else if (data.status === "failed") {
-    console.error("❌ Tradução falhou:", data);
+    console.error("Tradução falhou:", data);
   }
 
   return data;

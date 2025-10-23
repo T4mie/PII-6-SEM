@@ -1,4 +1,9 @@
 // src/backend/uploadFile.js
+
+// documentação de como fazer upload:
+// https://aps.autodesk.com/en/docs/data/v2/reference/http/buckets-:bucketKey-objects-:objectKey-signeds3upload-GET/
+// https://aps.autodesk.com/en/docs/data/v2/reference/http/buckets-:bucketKey-objects-:objectKey-signeds3upload-POST/
+
 import fetch from "node-fetch";
 import fs from "fs";
 
@@ -6,7 +11,7 @@ export async function uploadFile(token, filePath) {
   console.log("Fazendo upload do arquivo:", filePath);
 
   const bucketKey = "meu-bucket";
-  const objectKey = "meu-arquivo.rvt"; // usa o nome real do arquivo
+  const objectKey = "meu-arquivo.stl"; // usa o nome real do arquivo
 
   console.log("Object Key:", objectKey);
 
@@ -33,7 +38,7 @@ export async function uploadFile(token, filePath) {
   const file = fs.readFileSync(filePath);
   const uploadResp = await fetch(signedUrl, {
     method: "PUT",
-    headers: { "Content-Type": "application/vnd.autodesk.rvt" },
+    headers: { "Content-Type": "application/vnd.autodesk.stl" },
     body: file
   });
 
@@ -42,7 +47,7 @@ export async function uploadFile(token, filePath) {
     throw new Error(`Falha no upload para S3: ${uploadResp.status} - ${errText}`);
   }
 
-  console.log("✅ Upload feito com sucesso no S3 temporário!");
+  console.log("Upload feito com sucesso no S3 temporário!");
   const eTag = uploadResp.headers.get("etag");
 
   // 3. Confirmar upload no OSS
@@ -53,7 +58,7 @@ export async function uploadFile(token, filePath) {
       headers: {
         "Authorization": `Bearer ${token.access_token}`,
         "Content-Type": "application/json",
-        "x-ads-meta-Content-Type": "application/vnd.autodesk.rvt"
+        "x-ads-meta-Content-Type": "application/vnd.autodesk.stl"
       },
       body: JSON.stringify({
         uploadKey,

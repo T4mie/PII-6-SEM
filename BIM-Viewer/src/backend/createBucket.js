@@ -1,5 +1,7 @@
 // src/backend/createBucket.js
 
+// documentação de como criar um bucket:
+// https://aps.autodesk.com/en/docs/data/v2/reference/http/buckets-POST/
 import fetch from "node-fetch";
 
 // 2. Criar bucket (se ainda não existir)

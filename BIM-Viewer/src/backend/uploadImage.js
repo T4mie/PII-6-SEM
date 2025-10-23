@@ -1,4 +1,9 @@
-// /functions/uploadImage.js
+// src/backend/uploadImage.js
+
+// documentação de como fazer upload:
+// https://aps.autodesk.com/en/docs/data/v2/reference/http/buckets-:bucketKey-objects-:objectKey-signeds3upload-GET/
+// https://aps.autodesk.com/en/docs/data/v2/reference/http/buckets-:bucketKey-objects-:objectKey-signeds3upload-POST/
+
 import fs from "fs";
 import fetch from "node-fetch";
 

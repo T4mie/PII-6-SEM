@@ -21,7 +21,7 @@ export async function handleFileUpload(e, setIconFile, onUploadFile) {
     setIconFile(
       <FaCheckCircle
         size={48}
-        color="white"
+        color="green"
         style={{ position: "absolute" }}
       />
     );
@@ -53,7 +53,7 @@ export async function handleImageUpload(e, setIconImg, onUploadImage) {
     setIconImg(
       <FaCheckCircle
         size={48}
-        color="white"
+        color="green"
         style={{ position: "absolute" }}
       />
     );

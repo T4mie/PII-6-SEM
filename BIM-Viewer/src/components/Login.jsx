@@ -10,7 +10,12 @@ export async function handleLogin(email, senha, navigate) {
   try {
     await loginWithEmail(email, senha);
     toast.success("Login feito com sucesso!");
-    navigate("/upload");
+    
+    if (/android|iphone|ipad|iPod/i.test(navigator.userAgent)) {
+      navigate("/photo-upload");
+    } else {
+      navigate("/upload");
+    }
   } catch (error) {
     let msg = "Erro desconhecido ao fazer login.";
     switch (error.code) {

@@ -62,6 +62,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/photo-upload" element={<Login />} />
         <Route
           path="/upload"
           element={

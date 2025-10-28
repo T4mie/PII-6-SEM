@@ -12,7 +12,7 @@ export async function handleLogin(email, senha, navigate) {
     toast.success("Login feito com sucesso!");
     
     if (/android|iphone|ipad|iPod/i.test(navigator.userAgent)) {
-      navigate("/photo-upload");
+      navigate("/photoupload");
     } else {
       navigate("/upload");
     }

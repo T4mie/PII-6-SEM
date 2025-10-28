@@ -2,7 +2,7 @@
 
 ### Descrição do projeto:
 
-### Como rodar:
+### Como rodar localmente:
 1. Abra o diretório do projeto e rode
 ´npm install´
 para instalar as bibliotecas
@@ -13,6 +13,14 @@ Ele deve passar por todas as etapas do backend (Token, Criação do Bucket, Uplo
 
 2. Para rodar a aplicação, abra a pasta do projeto (BIM-Viewer) e rode o comando em outro terminal
 ´npm run dev´
+
+
+### Como fazer deploy no Github Pages:
+1. npm run build
+
+2. num run deply
+
+3. Espere a esteira terminar de rodar
 
 ### Observações:
 - O arquivo que está no root do projeto e atualmente se chama ./racbasicsampleproject.rvt

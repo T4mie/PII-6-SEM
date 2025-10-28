@@ -1,8 +1,9 @@
 // src/App.jsx
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import Upload_Screen from "./components/Upload_Screen";
 import Viewer from "./components/Viewer";
 import Login from "./components/Login";
+import PhotoUpload from "./components/Photo_Upload";
 import "./assets/css/viewer.css";
 import { useState } from "react";
 
@@ -12,7 +13,7 @@ function App() {
   const [screenshotUrl, setScreenshotUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Upload do arquivo
+  // Upload do arquivo RVT
   async function uploadFile(file) {
     if (!file) return;
     setIsLoading(true);
@@ -59,10 +60,10 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/photo-upload" element={<Login />} />
+        <Route path="/photoupload" element={<PhotoUpload />} />
         <Route
           path="/upload"
           element={
@@ -85,7 +86,7 @@ function App() {
           }
         />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

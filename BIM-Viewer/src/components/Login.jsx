@@ -45,43 +45,43 @@ export default function Login() {
 
   return (
     <div className="login-bg">
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-        className="login-card"
-      >
-        <div className="login-header">
-          <h1 className="login-title">Login</h1>
-          <p className="login-subtitle">Faça login para continuar</p>
-        </div>
-
-        <input
-          className="login-input"
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <input
-          className="login-input"
-          type="password"
-          placeholder="Senha"
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
-        />
-
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          className="login-btn"
-          onClick={onLoginClick}
+      <Toaster position="top-right" autoClose={3000} closeOnClick={true}/>
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="login-card"
         >
-          Entrar
-        </motion.button>
-      </motion.div>
-      <Toaster />
+          <div className="login-header">
+            <h1 className="login-title">Login</h1>
+            <p className="login-subtitle">Faça login para continuar</p>
+          </div>
+
+          <input
+            className="login-input"
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            className="login-input"
+            type="password"
+            placeholder="Senha"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+          />
+
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            className="login-btn"
+            onClick={onLoginClick}
+          >
+            Entrar
+          </motion.button>
+        </motion.div>
     </div>
   );
 }

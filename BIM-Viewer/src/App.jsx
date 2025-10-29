@@ -13,7 +13,7 @@ function App() {
   const [screenshotUrl, setScreenshotUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Upload do arquivo RVT
+  // Upload do arquivo
   async function uploadFile(file) {
     if (!file) return;
     setIsLoading(true);
@@ -21,7 +21,7 @@ function App() {
     formData.append("file", file);
 
     try {
-      const resp = await fetch("http://localhost:3000/upload/file", {
+      const resp = await fetch("https://pii-6-sem.onrender.com/upload/file", {
         method: "POST",
         body: formData,
       });
@@ -45,7 +45,7 @@ function App() {
     const formData = new FormData();
     formData.append("file", file);
 
-    const resp = await fetch("http://localhost:3000/upload/image", {
+    const resp = await fetch("https://pii-6-sem.onrender.com/upload/image", {
       method: "POST",
       body: formData,
     });

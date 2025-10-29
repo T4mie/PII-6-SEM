@@ -11,18 +11,23 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
   useEffect(() => {
     const options = {
       env: "AutodeskProduction",
-      getAccessToken: async (onSuccess) => {
-        try {
-          const tokenResp = await fetch("http://localhost:3000/api/token");
-          const tokenData = await tokenResp.json();
-          if (tokenData.access_token) {
-            onSuccess(tokenData.access_token, tokenData.expires_in);
-          } else {
-            console.error("Token inválido:", tokenData);
-          }
-        } catch (err) {
-          console.error("Erro ao obter token:", err);
-        }
+      getAccessToken(onSuccess, onError) {
+        fetch("https://pii-6-sem.onrender.com/api/token")
+          .then(async (response) => {
+            const text = await response.text();
+            try {
+              const data = JSON.parse(text);
+              if (data.access_token) {
+                onSuccess(data.access_token, data.expires_in);
+              } else {
+                console.error("Token inválido:", data);
+                onError && onError("Token inválido");
+              }
+            } catch (e) {
+              console.error("Resposta inesperada do servidor:", text);
+              onError && onError("Resposta inesperada do servidor");
+            }
+          })
       },
     };
 
@@ -56,7 +61,7 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
                       formData.append("img1", img1, "imagem1.jpg");
                       formData.append("img2", img2, "imagem2.jpg");
 
-                      const resp = await fetch("http://localhost:3000/api/compare", {
+                      const resp = await fetch("https://pii-6-sem.onrender.com/api/compare", {
                         method: "POST",
                         body: formData,
                       });

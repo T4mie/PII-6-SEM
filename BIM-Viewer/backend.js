@@ -17,13 +17,15 @@ const app = express();
 const port = 3000;
 let token = null;
 
-dotenv.config();
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://t4mie.github.io",
+  "https://t4mie.github.io/PII-6-SEM/",
+  "https://trainsick-shalonda-unwildly.ngrok-free.dev"
+];
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-  })
-);
+dotenv.config();
 
 // Configuração do multer para upload temporário
 const upload = multer({ dest: "uploads/" });
@@ -31,14 +33,52 @@ const upload = multer({ dest: "uploads/" });
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     // Permite requisições sem "origin" (ex: Postman, backend interno)
+//     if (!origin) return callback(null, true);
+//     if (allowedOrigins.includes(origin)) {
+//       return callback(null, true);
+//     } else {
+//       return callback(new Error("Not allowed by CORS"));
+//     }
+//   },
+//   credentials: true,
+// }));
+
+app.use(cors({
+  origin: (origin, callback) => {
+    console.log("[CORS] Origin recebida:", origin);
+    callback(null, true); // permitir todas temporariamente
+  },
+  credentials: true,
+}));
+
+app.use((req, res, next) => {
+  console.log(`📥 [${req.method}] ${req.originalUrl} - Origem: ${req.headers.origin || "sem origem"}`);
+  next();
+});
+
 app.get("/api/token", async (req, res) => {
   try {
+    console.log("[REQ] /api/token chamado");
+    console.log("Origem da requisição:", req.headers.origin || "sem origem");
+    console.log("URL completa:", req.protocol + "://" + req.get("host") + req.originalUrl);
+
+    if (!token) {
+      console.warn("Token ainda não inicializado no servidor!");
+      return res.status(500).json({ error: "Token não disponível no momento" });
+    }
+
+    console.log("Token sendo retornado ao cliente (truncado):", token.access_token?.substring(0, 30) + "...");
+
     res.json(token);
   } catch (err) {
     console.error("Erro em /api/token:", err);
     res.status(500).json({ error: "Erro ao obter token" });
   }
 });
+
 
 app.post("/upload/image", upload.single("file"), async (req, res) => {
   try {
@@ -60,9 +100,9 @@ app.post("/upload/image", upload.single("file"), async (req, res) => {
 app.post("/upload/file", upload.single("file"), async (req, res) => {
   try {
 
-    console.log("Recebendo arquivo RVT:", req.file.originalname);
+    console.log("Recebendo arquivo:", req.file.originalname);
 
-    // Upload do arquivo RVT
+    // Upload do arquivo
     const result = await uploadFile(token, req.file.path);
 
     // Tradução do arquivo e verificação do status
@@ -75,7 +115,7 @@ app.post("/upload/file", upload.single("file"), async (req, res) => {
     console.log("Upload e tradução concluídos com sucesso!");
     res.json({ urn });
   } catch (err) {
-    console.error("Erro no upload RVT:", err);
+    console.error("Erro no upload:", err);
     res.status(500).json({ error: err.message });
   }
 });

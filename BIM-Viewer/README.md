@@ -22,10 +22,5 @@ Ele deve passar por todas as etapas do backend (Token, Criação do Bucket, Uplo
 
 3. Espere a esteira terminar de rodar
 
-### Rodando o backend no ngrok
-1. Abra o terminal no diretório do BIM-Viewer, rode node backend.js
-
-2. Abra um segundo terminal, e rode o comando ngrok http 3000
-
 ### Observações:
 - Os segredps estão em um arquivo .env que a equipe do projeto possui

@@ -22,7 +22,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://t4mie.github.io",
   "https://t4mie.github.io/PII-6-SEM/",
-  "https://trainsick-shalonda-unwildly.ngrok-free.dev"
+  "https://pii-6-sem.onrender.com",
 ];
 
 dotenv.config();
@@ -33,37 +33,37 @@ const upload = multer({ dest: "uploads/" });
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 
-// app.use(cors({
-//   origin: function (origin, callback) {
-//     // Permite requisições sem "origin" (ex: Postman, backend interno)
-//     if (!origin) return callback(null, true);
-//     if (allowedOrigins.includes(origin)) {
-//       return callback(null, true);
-//     } else {
-//       return callback(new Error("Not allowed by CORS"));
-//     }
-//   },
-//   credentials: true,
-// }));
-
 app.use(cors({
-  origin: (origin, callback) => {
-    console.log("[CORS] Origin recebida:", origin);
-    callback(null, true); // permitir todas temporariamente
+  origin: function (origin, callback) {
+    // Permite requisições sem "origin" (ex: Postman, backend interno)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("Not allowed by CORS"));
+    }
   },
   credentials: true,
 }));
 
-app.use((req, res, next) => {
-  console.log(`📥 [${req.method}] ${req.originalUrl} - Origem: ${req.headers.origin || "sem origem"}`);
-  next();
-});
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     console.log("[CORS] Origin recebida:", origin);
+//     callback(null, true); // permitir todas temporariamente
+//   },
+//   credentials: true,
+// }));
+
+// app.use((req, res, next) => {
+//   console.log(`📥 [${req.method}] ${req.originalUrl} - Origem: ${req.headers.origin || "sem origem"}`);
+//   next();
+// });
 
 app.get("/api/token", async (req, res) => {
   try {
-    console.log("[REQ] /api/token chamado");
-    console.log("Origem da requisição:", req.headers.origin || "sem origem");
-    console.log("URL completa:", req.protocol + "://" + req.get("host") + req.originalUrl);
+    // console.log("[REQ] /api/token chamado");
+    // console.log("Origem da requisição:", req.headers.origin || "sem origem");
+    // console.log("URL completa:", req.protocol + "://" + req.get("host") + req.originalUrl);
 
     if (!token) {
       console.warn("Token ainda não inicializado no servidor!");

@@ -19,7 +19,7 @@ export async function compareImages(imagePath1, imagePath2) {
           content: [
             {
               type: "text",
-              text: "Compare visualmente as duas imagens e diga apenas a porcentagem (0 a 100) de quão semelhantes são.",
+              text: "Compare visualmente as duas imagens e diga apenas a porcentagem (0 a 100) do quão semelhantes são.",
             },
             {
               type: "image_url",

@@ -5,9 +5,7 @@ import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 export async function handleFileUpload(e, setIconFile, onUploadFile) {
   const file = e.target.files[0];
   if (!file) return false;
-
   const extension = file.name.split(".").pop().toLowerCase();
-
   if (extension !== "stl") {
     setIconFile(
       <FaTimesCircle
@@ -18,6 +16,10 @@ export async function handleFileUpload(e, setIconFile, onUploadFile) {
     );
     return false;
   } else {
+    
+    if (onUploadFile) {
+      await onUploadFile(file);
+    }
     setIconFile(
       <FaCheckCircle
         size={48}
@@ -25,11 +27,7 @@ export async function handleFileUpload(e, setIconFile, onUploadFile) {
         style={{ position: "absolute" }}
       />
     );
-    if (onUploadFile) {
-      await onUploadFile(file);
-      return true;
-    }
-    return false;
+    return true;
   }
 }
 
@@ -37,9 +35,7 @@ export async function handleFileUpload(e, setIconFile, onUploadFile) {
 export async function handleImageUpload(e, setIconImg, onUploadImage) {
   const file = e.target.files[0];
   if (!file) return false;
-
   const extension = file.name.split(".").pop().toLowerCase();
-
   if (extension !== "png" && extension !== "jpeg" && extension !== "jpg") {
     setIconImg(
       <FaTimesCircle
@@ -50,6 +46,10 @@ export async function handleImageUpload(e, setIconImg, onUploadImage) {
     );
     return false;
   } else {
+    
+    if (onUploadImage) {
+      await onUploadImage(file);
+    }
     setIconImg(
       <FaCheckCircle
         size={48}
@@ -57,10 +57,6 @@ export async function handleImageUpload(e, setIconImg, onUploadImage) {
         style={{ position: "absolute" }}
       />
     );
-    if (onUploadImage) {
-      await onUploadImage(file);
-      return true;
-    }
-    return false;
+    return true;
   }
 }

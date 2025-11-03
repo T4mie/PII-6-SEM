@@ -23,16 +23,16 @@ export async function compareImages(imagePath1, imagePath2) {
           role: "user",
           content: [
             {
-              type: "input_text",
+              type: "text",
               text: "Compare visualmente as duas imagens e diga apenas a porcentagem (0 a 100) do quão semelhantes são.",
             },
             {
-              type: "input_image",
-              image_url: { url: `data:image/jpeg;base64,${img1Base64}` },
+              type: "image_url",
+              image_url: `data:image/jpeg;base64,${img1Base64}`,
             },
             {
-              type: "input_image",
-              image_url: { url: `data:image/jpeg;base64,${img2Base64}` },
+              type: "image_url",
+              image_url: `data:image/jpeg;base64,${img2Base64}`,
             },
           ],
         },

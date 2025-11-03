@@ -57,6 +57,7 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
                       const formData = new FormData();
                       const img1 = await fetch(imageUrl).then((r) => r.blob());
                       const img2 = await fetch(blobURL).then((r) => r.blob());
+                      console.log("imagem um: ",img1," imagem dois: ", img2);
 
                       formData.append("img1", img1, "imagem1.jpg");
                       formData.append("img2", img2, "imagem2.jpg");
@@ -74,6 +75,8 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
                     } finally {
                       setIsComparing(false);
                     }
+                  } else {
+                    console.warn("Nenhuma imagem enviada para comparar.");
                   }
                 });
               }, 2000);

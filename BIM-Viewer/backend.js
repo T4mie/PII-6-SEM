@@ -69,16 +69,12 @@ app.get("/api/token", async (req, res) => {
       console.warn("Token ainda não inicializado no servidor!");
       return res.status(500).json({ error: "Token não disponível no momento" });
     }
-
-    console.log("Token sendo retornado ao cliente (truncado):", token.access_token?.substring(0, 30) + "...");
-
     res.json(token);
   } catch (err) {
     console.error("Erro em /api/token:", err);
     res.status(500).json({ error: "Erro ao obter token" });
   }
 });
-
 
 app.post("/upload/image", upload.single("file"), async (req, res) => {
   try {

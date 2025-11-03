@@ -122,19 +122,24 @@ app.post("/upload/file", upload.single("file"), async (req, res) => {
 
 app.post("/api/compare", upload.fields([{ name: "img1" }, { name: "img2" }]), async (req, res) => {
   try {
-    const img1 = req.files["img1"][0].path;
-    const img2 = req.files["img2"][0].path;
+    console.log("Arquivos recebidos:", req.files);
+    console.log("OPENAI_API_KEY existe?", !!process.env.OPENAI_API_KEY);
+
+    const img1 = req.files?.["img1"]?.[0]?.path;
+    const img2 = req.files?.["img2"]?.[0]?.path;
+
+    if (!img1 || !img2) {
+      throw new Error("Arquivos não recebidos corretamente pelo servidor");
+    }
 
     const result = await compareImages(img1, img2);
-
-    // Limpa arquivos temporários
     fs.unlinkSync(img1);
     fs.unlinkSync(img2);
 
     res.json(result);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erro ao comparar imagens" });
+    console.error("ERRO DETALHADO:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 

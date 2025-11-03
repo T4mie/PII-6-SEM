@@ -11,8 +11,6 @@ const openai = new OpenAI({
 
 export async function compareImages(imagePath1, imagePath2) {
   try {
-    // A API multimodal do Chat espera que objetos de mídia venham como objetos,
-    // por exemplo: { type: 'input_image', image_url: { url: 'data:...' } }
     const img1Base64 = fs.readFileSync(imagePath1, { encoding: "base64" });
     const img2Base64 = fs.readFileSync(imagePath2, { encoding: "base64" });
 
@@ -28,26 +26,23 @@ export async function compareImages(imagePath1, imagePath2) {
             },
             {
               type: "image_url",
-              image_url: `data:image/jpeg;base64,${img1Base64}`,
+              image_url: { url: `data:image/jpeg;base64,${img1Base64}` },
             },
             {
               type: "image_url",
-              image_url: `data:image/jpeg;base64,${img2Base64}`,
+              image_url: { url: `data:image/jpeg;base64,${img2Base64}` },
             },
           ],
         },
       ],
     });
 
-    // Dependendo da versão do SDK/retorno, a resposta pode estar em diferentes
-    // formatos. Tentamos extrair texto de maneira defensiva.
     let resultText = "";
     try {
       const msgContent = response.choices[0].message.content;
       if (typeof msgContent === "string") {
         resultText = msgContent.trim();
       } else if (Array.isArray(msgContent) && msgContent.length > 0) {
-        // procurar primeiro bloco de texto
         const textBlock = msgContent.find((c) => c.type && c.type.includes("text"));
         if (textBlock && textBlock.text) resultText = textBlock.text.trim();
         else if (msgContent[0].text) resultText = msgContent[0].text.trim();
@@ -60,7 +55,6 @@ export async function compareImages(imagePath1, imagePath2) {
 
     return { similarity: resultText };
   } catch (error) {
-    // Imprimir detalhes do erro para diagnóstico
     console.error("Erro na comparação de imagens:", error);
     throw new Error("Falha ao comparar imagens");
   }

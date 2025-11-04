@@ -22,7 +22,7 @@ export async function compareImages(imagePath1, imagePath2) {
           content: [
             {
               type: "text",
-              text: "Compare visualmente as duas imagens e diga apenas a porcentagem (0 a 100) do quão semelhantes são.",
+              text: "Compare visualmente as duas imagens e diga apenas a porcentagem (0 a 100) do quão semelhantes são. Aponte o que há de diferente do modelo da construção real, recomendações e em que fase da construção a foto enviada se encontra.",
             },
             {
               type: "image_url",

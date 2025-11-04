@@ -1,12 +1,12 @@
 // src/uploadHandle.jsx
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
-// --- Upload do modelo (.stl) ---
+// --- Upload do modelo ---
 export async function handleFileUpload(e, setIconFile, onUploadFile) {
   const file = e.target.files[0];
   if (!file) return false;
   const extension = file.name.split(".").pop().toLowerCase();
-  if (extension !== "stl") {
+  if (extension !== "stl" && extension !== "obj" && extension !== "dae") {
     setIconFile(
       <FaTimesCircle
         size={48}

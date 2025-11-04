@@ -11,7 +11,7 @@ export async function uploadFile(token, filePath) {
   console.log("Fazendo upload do arquivo:", filePath);
 
   const bucketKey = "meu-bucket";
-  const objectKey = "meu-arquivo.stl"; // usa o nome real do arquivo
+  const objectKey = "meu-arquivo.stl";
 
   console.log("Object Key:", objectKey);
 

@@ -1,8 +1,7 @@
 // storage.js
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { app } from "./firebase"; // importa a instância inicializada
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "./firebase.js"; // importa a instância inicializada
 
-const storage = getStorage(app);
 
 /**
  * Faz upload de uma imagem para o Firebase Storage

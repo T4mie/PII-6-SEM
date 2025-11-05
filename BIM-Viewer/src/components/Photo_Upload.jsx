@@ -30,7 +30,7 @@ export default function PhotoUpload() {
     async function checkUser() {
       const user = getCurrentUser();
       if (user) {
-        const adminStatus = user.email === "admin@empresa.com";
+        const adminStatus = user.email === "admin@email.com";
         setIsAdmin(adminStatus);
         if (!adminStatus) await fetchFolders();
       }

@@ -18,6 +18,7 @@ export default function PhotoUpload() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [creatingNew, setCreatingNew] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+  const [imageName, setImageName] = useState(""); // 🆕 Novo campo
 
   useEffect(() => {
     async function fetchFolders() {
@@ -44,15 +45,20 @@ export default function PhotoUpload() {
   const handleFileChange = (e) => setFile(e.target.files[0]);
 
   const handleUpload = async () => {
-    if (!file || !codigo) {
-      setError("Informe o código e selecione uma imagem!");
+    if (!file || !codigo || !imageName.trim()) {
+      setError("Informe o código, o nome da imagem e selecione um arquivo!");
       return;
     }
 
     setLoading(true);
     setError("");
+
     try {
-      const imageUrl = await uploadConstructionPhoto(file, codigo, isAdmin);
+      // 🔤 renomeia o arquivo com base no campo "imageName"
+      const extension = file.name.split(".").pop();
+      const renamedFile = new File([file], `${imageName}.${extension}`, { type: file.type });
+
+      const imageUrl = await uploadConstructionPhoto(renamedFile, codigo, isAdmin);
       setUrl(imageUrl);
       alert("Upload concluído com sucesso!");
     } catch (err) {
@@ -131,6 +137,16 @@ export default function PhotoUpload() {
             <button onClick={handleCreateFolder}>Criar pasta</button>
           </div>
         )}
+
+        {/* 🆕 Campo de nome da imagem */}
+        <p>Informe o nome da imagem</p>
+        <input
+          type="text"
+          placeholder="Ex: fachada_frontal"
+          value={imageName}
+          onChange={(e) => setImageName(e.target.value)}
+          className="photo-upload-input"
+        />
 
         <p>Insira foto da construção</p>
         <div className="photo-upload-container">

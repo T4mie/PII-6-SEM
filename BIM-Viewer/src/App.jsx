@@ -65,7 +65,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/photoupload" element={<PhotoUpload />} />
         <Route
-          path="/selecao"
+          path="/upload"
           element={
             <Upload_Screen
               onUploadFile={uploadFile}

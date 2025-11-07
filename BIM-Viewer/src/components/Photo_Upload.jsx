@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { MdAddAPhoto } from "react-icons/md";
+import { MdAddAPhoto, MdCreateNewFolder } from "react-icons/md";
 import "../assets/css/photo_upload.css";
 import {
   uploadConstructionPhoto,
   listConstructionFolders,
+  createEmptyFolder,
 } from "../backend/storage";
 import { getCurrentUser } from "../backend/auth";
 
@@ -15,8 +16,9 @@ export default function PhotoUpload() {
   const [error, setError] = useState("");
   const [folders, setFolders] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [creatingNew, setCreatingNew] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
 
-  // Carrega as pastas existentes
   useEffect(() => {
     async function fetchFolders() {
       try {
@@ -32,16 +34,14 @@ export default function PhotoUpload() {
       if (user) {
         const adminStatus = user.email === "admin@email.com";
         setIsAdmin(adminStatus);
-        if (!adminStatus) await fetchFolders();
+        await fetchFolders();
       }
     }
 
     checkUser();
   }, []);
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
+  const handleFileChange = (e) => setFile(e.target.files[0]);
 
   const handleUpload = async () => {
     if (!file || !codigo) {
@@ -51,7 +51,6 @@ export default function PhotoUpload() {
 
     setLoading(true);
     setError("");
-
     try {
       const imageUrl = await uploadConstructionPhoto(file, codigo, isAdmin);
       setUrl(imageUrl);
@@ -64,20 +63,32 @@ export default function PhotoUpload() {
     }
   };
 
+  const handleCreateFolder = async () => {
+    if (!newFolderName.trim()) {
+      alert("Informe um nome para a nova pasta!");
+      return;
+    }
+
+    try {
+      await createEmptyFolder(newFolderName);
+      alert("Nova pasta criada com sucesso!");
+      setCreatingNew(false);
+      setNewFolderName("");
+      const lista = await listConstructionFolders();
+      setFolders(lista);
+      setCodigo(newFolderName);
+    } catch (err) {
+      console.error("Erro ao criar pasta:", err);
+      alert("Erro ao criar nova pasta.");
+    }
+  };
+
   return (
     <div className="photo-upload-root">
       <div className="photo-upload-box">
-        <p>Selecione ou insira o código da construção</p>
+        <p>Selecione ou crie o código da construção</p>
 
-        {isAdmin ? (
-          <input
-            className="photo-upload-input"
-            type="text"
-            value={codigo}
-            onChange={(e) => setCodigo(e.target.value)}
-            placeholder="Código de Construção (nova pasta)"
-          />
-        ) : (
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           <select
             className="photo-upload-input"
             value={codigo}
@@ -90,6 +101,35 @@ export default function PhotoUpload() {
               </option>
             ))}
           </select>
+
+          {isAdmin && (
+            <button
+              title="Criar nova construção"
+              onClick={() => setCreatingNew(!creatingNew)}
+              style={{
+                backgroundColor: "#1e88e5",
+                border: "none",
+                borderRadius: "8px",
+                padding: "8px 10px",
+                cursor: "pointer",
+              }}
+            >
+              <MdCreateNewFolder size={22} color="white" />
+            </button>
+          )}
+        </div>
+
+        {creatingNew && (
+          <div style={{ marginTop: "10px" }}>
+            <input
+              type="text"
+              placeholder="Nome da nova construção"
+              value={newFolderName}
+              onChange={(e) => setNewFolderName(e.target.value)}
+              className="photo-upload-input"
+            />
+            <button onClick={handleCreateFolder}>Criar pasta</button>
+          </div>
         )}
 
         <p>Insira foto da construção</p>

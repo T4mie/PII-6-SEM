@@ -59,3 +59,24 @@ export async function listConstructionFolders() {
     throw error;
   }
 }
+
+/**
+ * Cria uma nova pasta "vazia" no Firebase Storage
+ * (utiliza um arquivo .placeholder)
+ * @param {string} codigo - Nome da nova pasta
+ * @returns {Promise<void>}
+ */
+export async function createEmptyFolder(codigo) {
+  if (!codigo) throw new Error("Código inválido para criação de pasta");
+
+  try {
+    // Cria um arquivo "vazio" dentro da pasta
+    const placeholderRef = ref(storage, `construcoes/${codigo}/.placeholder`);
+    const placeholderContent = new Blob([""], { type: "text/plain" });
+    await uploadBytes(placeholderRef, placeholderContent);
+    console.log(`Pasta '${codigo}' criada com sucesso.`);
+  } catch (error) {
+    console.error("Erro ao criar nova pasta:", error);
+    throw error;
+  }
+}

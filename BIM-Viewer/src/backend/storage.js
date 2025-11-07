@@ -1,5 +1,5 @@
 // storage.js
-import { ref, listAll, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, listAll, uploadBytes, getDownloadURL, getStorage } from "firebase/storage";
 import { storage } from "./firebase.js";
 
 /**
@@ -79,4 +79,15 @@ export async function createEmptyFolder(codigo) {
     console.error("Erro ao criar nova pasta:", error);
     throw error;
   }
+}
+
+export async function listImagesInFolder(folderName) {
+  const folderRef = ref(storage, `construcoes/${folderName}`);
+  const res = await listAll(folderRef);
+  return res.items.map((item) => item.name);
+}
+
+export async function getImageURL(folderName, imageName) {
+  const imageRef = ref(storage, `construcoes/${folderName}/${imageName}`);
+  return await getDownloadURL(imageRef);
 }

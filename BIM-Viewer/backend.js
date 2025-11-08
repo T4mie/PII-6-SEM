@@ -4,7 +4,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
-import axios from "axios"; // novo: axios para baixar imagens de forma robusta
 
 // Importando funções modularizadas
 import { getToken } from "./src/backend/createToken.js";
@@ -13,8 +12,6 @@ import { uploadFile } from "./src/backend/uploadFile.js";
 import { translateFile, checkTranslationStatus } from "./src/backend/translateFile.js";
 import { uploadImage } from "./src/backend/uploadImage.js";
 import { compareImages } from "./src/backend/compareImages.js";
-
-dotenv.config();
 
 const app = express();
 const port = 3000;
@@ -28,6 +25,13 @@ const allowedOrigins = [
   "https://pii-6-sem.onrender.com",
 ];
 
+dotenv.config();
+
+// Configuração do multer para upload temporário
+const upload = multer({ dest: "uploads/" });
+
+const client_id = process.env.CLIENT_ID;
+const client_secret = process.env.CLIENT_SECRET;
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -42,18 +46,25 @@ app.use(cors({
   credentials: true,
 }));
 
-// necessário para receber JSON no body (ex.: fetch com Content-Type: application/json)
-app.use(express.json({ limit: "5mb" }));
-app.use(express.urlencoded({ extended: true }));
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     console.log("[CORS] Origin recebida:", origin);
+//     callback(null, true); // permitir todas temporariamente
+//   },
+//   credentials: true,
+// }));
 
-// Configuração do multer para upload temporário
-const upload = multer({ dest: "uploads/" });
-
-const client_id = process.env.CLIENT_ID;
-const client_secret = process.env.CLIENT_SECRET;
+// app.use((req, res, next) => {
+//   console.log(`📥 [${req.method}] ${req.originalUrl} - Origem: ${req.headers.origin || "sem origem"}`);
+//   next();
+// });
 
 app.get("/api/token", async (req, res) => {
   try {
+    // console.log("[REQ] /api/token chamado");
+    // console.log("Origem da requisição:", req.headers.origin || "sem origem");
+    // console.log("URL completa:", req.protocol + "://" + req.get("host") + req.originalUrl);
+
     if (!token) {
       console.warn("Token ainda não inicializado no servidor!");
       return res.status(500).json({ error: "Token não disponível no momento" });
@@ -90,9 +101,10 @@ app.post("/upload/image", upload.single("file"), async (req, res) => {
   }
 });
 
+
 app.post("/upload/file", upload.single("file"), async (req, res) => {
   try {
-    if (!req.file) throw new Error("Arquivo não enviado");
+
     console.log("Recebendo arquivo:", req.file.originalname);
 
     // Upload do arquivo
@@ -136,43 +148,24 @@ app.post("/api/compare", upload.fields([{ name: "img1" }, { name: "img2" }]), as
   }
 });
 
-// Rota atualizada para buscar imagem por URL (usa axios)
+// backend.js
 app.post("/api/fetch-image", async (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ error: "URL ausente" });
+
   try {
-    const { url } = req.body || {};
-    if (!url) {
-      console.warn("/api/fetch-image chamado sem 'url' no body");
-      return res.status(400).json({ error: "URL ausente" });
-    }
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Falha ao baixar imagem");
+    const buffer = await response.arrayBuffer();
 
-    console.log("Tentando baixar imagem:", url);
-
-    // Usa axios para garantir responseType arraybuffer (binário)
-    const response = await axios.get(url, {
-      responseType: "arraybuffer",
-      timeout: 20000, // 20s timeout
-      headers: {
-        // Em alguns casos, Firebase exige um User-Agent "normal"
-        "User-Agent": "Mozilla/5.0 (compatible; Node.js server)",
-        Accept: "image/*",
-      },
-      validateStatus: (status) => status >= 200 && status < 300, // aceita 2xx
-    });
-
-    const contentType = response.headers["content-type"] || "image/jpeg";
-    const buffer = Buffer.from(response.data);
-
-    res.setHeader("Content-Type", contentType);
-    res.send(buffer);
+    res.setHeader("Content-Type", response.headers.get("content-type") || "image/jpeg");
+    res.send(Buffer.from(buffer));
   } catch (err) {
-    console.error("Erro ao buscar imagem (/api/fetch-image):", err && err.message ? err.message : err);
-    // Se for erro de status do axios, incluir status e mensagem
-    if (err.response) {
-      console.error("Status recebido ao buscar imagem:", err.response.status, err.response.statusText);
-    }
+    console.error("Erro ao buscar imagem:", err);
     res.status(500).json({ error: "Falha ao buscar imagem" });
   }
 });
+
 
 (async () => {
   try {
@@ -184,6 +177,7 @@ app.post("/api/fetch-image", async (req, res) => {
   }
 })();
 
+
 app.listen(port, () =>
-  console.log(`Servidor rodando em http://localhost:${port} — porta real: ${port}`)
+  console.log(`Servidor rodando em http://localhost:${port}`)
 );

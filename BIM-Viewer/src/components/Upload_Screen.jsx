@@ -134,7 +134,7 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
 
           {/* Upload do modelo */}
           <div className="collum">
-            <h2>Insira o modelo da construção</h2>
+            <h3>Insira o modelo da construção</h3>
             <motion.div
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
@@ -151,7 +151,7 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
 
           {/* Seleção da imagem existente */}
           <div className="collum">
-            <h2>Selecione a foto da construção existente</h2>
+            <h3>Selecione a foto da construção existente</h3>
 
             {/* Dropdown para pastas */}
             <select
@@ -205,15 +205,13 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
                 />
               </div>
             )}
-            <button onClick={handleSelectImage} style={{background: "#4b5ebeff",width: "100%",}}>
-              Selecionar Imagem
-            </button>
+            
           </div>
 
           <div className="divisor"></div>
       </div>
       <div className="advance-button">
-        <button style={{background: "#4b5ebeff",}}>Enviar para Comparação</button>
+        <button onClick={handleSelectImage} style={{background: "#4b5ebeff",}}>Enviar para Comparação</button>
       </div>
     </motion.div>
   );

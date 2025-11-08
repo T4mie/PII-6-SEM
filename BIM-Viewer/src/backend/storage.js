@@ -1,11 +1,9 @@
-// storage.js
+// src/backend/storage.js
 import { ref, listAll, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "./firebase.js";
 
 /**
  * Verifica se uma pasta existe no Firebase Storage
- * @param {string} codigo - Nome da pasta
- * @returns {Promise<boolean>} - true se a pasta existir
  */
 export async function checkIfFolderExists(codigo) {
   try {
@@ -20,27 +18,22 @@ export async function checkIfFolderExists(codigo) {
 
 /**
  * Faz upload de uma imagem para o Firebase Storage
- * @param {File} file - Arquivo da imagem
- * @param {string} codigo - Código (pasta)
- * @param {boolean} isAdmin - Se o usuário é admin
  */
 export async function uploadConstructionPhoto(file, codigo, isAdmin = false) {
   if (!file || !codigo) throw new Error("Arquivo ou código inválido");
 
   const folderExists = await checkIfFolderExists(codigo);
   if (!folderExists && !isAdmin) {
-    throw new Error(
-      `A pasta "${codigo}" não existe. Apenas o administrador pode criá-la.`
-    );
+    throw new Error(`A pasta "${codigo}" não existe. Apenas o administrador pode criá-la.`);
   }
 
   try {
     const fileRef = ref(storage, `construcoes/${codigo}/${file.name}`);
     await uploadBytes(fileRef, file);
-    let downloadURL = await getDownloadURL(fileRef);
+    let downloadURL = await getDownloaAdURL(fileRef);
 
-    // 🔧 Corrige URLs com domínio incorreto (ex: .app → .appspot.com)
-    downloadURL = downloadURL.replace("firebasestorage.app", "appspot.com");
+    // ✅ Corrige URLs antigas (appspot → firebasestorage.app)
+    downloadURL = downloadURL.replace("appspot.com", "firebasestorage.app");
 
     console.log("Imagem enviada com sucesso:", downloadURL);
     return downloadURL;
@@ -52,7 +45,6 @@ export async function uploadConstructionPhoto(file, codigo, isAdmin = false) {
 
 /**
  * Lista todas as pastas existentes em /construcoes
- * @returns {Promise<string[]>} - Lista de nomes de pastas
  */
 export async function listConstructionFolders() {
   try {
@@ -67,9 +59,6 @@ export async function listConstructionFolders() {
 
 /**
  * Cria uma nova pasta "vazia" no Firebase Storage
- * (utiliza um arquivo .placeholder)
- * @param {string} codigo - Nome da nova pasta
- * @returns {Promise<void>}
  */
 export async function createEmptyFolder(codigo) {
   if (!codigo) throw new Error("Código inválido para criação de pasta");
@@ -100,7 +89,9 @@ export async function listImagesInFolder(folderName) {
 export async function getImageURL(folderName, imageName) {
   const imageRef = ref(storage, `construcoes/${folderName}/${imageName}`);
   let url = await getDownloadURL(imageRef);
-  // 🔧 Corrige domínio, se necessário
-  url = url.replace("firebasestorage.app", "appspot.com");
+
+  // ✅ Corrige para o domínio certo
+  url = url.replace("appspot.com", "firebasestorage.app");
+
   return url;
 }

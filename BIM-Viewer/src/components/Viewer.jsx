@@ -6,10 +6,10 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
   const [isComparing, setIsComparing] = useState(false);
   const [viewer, setViewer] = useState(null);
 
-  // 🔧 Corrige domínio errado do Firebase Storage
+  // ✅ Corrigido — não altera mais o domínio (mantém firebasestorage.app)
   function fixFirebaseUrl(url) {
     if (!url) return url;
-    return url.replace("firebasestorage.app", "appspot.com");
+    return url; // não faz replace, pois o domínio correto é firebasestorage.app
   }
 
   // Inicializa o Autodesk Viewer
@@ -59,7 +59,7 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
     return () => viewer && viewer.finish();
   }, [urn]);
 
-  // Função chamada ao clicar em “Comparar Imagens”
+  // Função de comparação de imagens
   async function handleCompare() {
     if (!viewer) {
       alert("Viewer ainda não foi inicializado!");
@@ -79,11 +79,11 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
         setScreenshotUrl(blobURL);
         console.log("Screenshot capturado!");
 
-        // 🔧 Corrige URL do Firebase antes de fazer o fetch
+        // ✅ Usa URL original do Firebase (sem replace)
         const fixedImageUrl = fixFirebaseUrl(imageUrl);
 
         const formData = new FormData();
-        console.log("Baixando imagem via URL corrigida:", fixedImageUrl);
+        console.log("Baixando imagem via URL:", fixedImageUrl);
 
         const img1Response = await fetch(fixedImageUrl);
         if (!img1Response.ok) throw new Error(`Falha ao baixar imagem Firebase (${img1Response.status})`);
@@ -165,7 +165,7 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
         </div>
       )}
 
-      {/* Botão para capturar screenshot e comparar */}
+      {/* Botão de comparação */}
       <div style={{ marginTop: "30px" }}>
         <button
           onClick={handleCompare}

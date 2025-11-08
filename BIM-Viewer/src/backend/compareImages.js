@@ -22,7 +22,8 @@ export async function compareImages(imagePath1, imagePath2) {
           content: [
             {
               type: "text",
-              text: "Compare visualmente as duas imagens e diga: 1. A porcentagem (0 a 100) do quão semelhantes são 2. Aponte o que há de diferente do modelo da construção real em tópicos 3. Em que fase da construção a foto enviada se encontra. Siga esse roteiro: 1. Progresso: (em porcentagem) 2. Diferenças: (tópicos) 3. Fase da construção: (descreva). Responda apenas no formato: Progresso: X% Diferenças: ... Fase da construção: ... Observação: desconsiere a diferença de cor e transparência.",
+              text: "Compare visualmente as duas imagens e diga: 1. A porcentagem (0 a 100) do quão semelhantes são 2. Aponte o que há de diferente do modelo da construção real em tópicos 3. Em que fase da construção a foto enviada se encontra. Siga esse roteiro: 1. Progresso: (em porcentagem) 2. Diferenças: (tópicos) 3. Faça uma sintese do estado atual da construção de acordo com a foto em relação ao modelo, ou seja, admita que o modelo corresponde ao 100% e que uma foto com perfeita correlação deve fornecer como sintese 'obra concluida': (descreva). Responda apenas no formato: Progresso: X% Diferenças: ... Fase da construção: ... Observação: desconsiere a diferença de cor e transparência.",
+
             },
             {
               type: "image_url",

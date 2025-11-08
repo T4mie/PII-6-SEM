@@ -22,7 +22,23 @@ export async function compareImages(imagePath1, imagePath2) {
           content: [
             {
               type: "text",
-              text: "Compare visualmente as duas imagens e retorne apenas um JSON no seguinte formato:\n{\n  \"progresso\": \"<porcentagem de similaridade de 0 a 100>\",\n  \"diferencas\": [\n    \"<diferença 1>\",\n    \"<diferença 2>\",\n    \"<diferença 3>\"\n  ],\n  \"fase_construcao\": \"<descrição da fase da construção>\"\n}\nAs instruções são:\n\n1. Compare as duas imagens visualmente.\n2. Calcule a porcentagem (0 a 100) que representa o quão semelhantes elas são.\n3. Liste em tópicos as diferenças entre o modelo e a construção real.\n4. Descreva em que fase da construção a foto enviada se encontra, considerando que o modelo corresponde a 100% (obra concluída).\n5. Desconsidere diferenças de cor e transparência dos materiais.\n\nRetorne somente o JSON, sem comentários ou explicações adicionais.",              
+              text: `Compare visualmente as duas imagens e retorne apenas um JSON no seguinte formato:
+{
+  "progresso": "<porcentagem de similaridade de 0 a 100>",
+  "diferencas": [
+    "<diferença 1>",
+    "<diferença 2>",
+    "<diferença 3>"
+  ],
+  "fase_construcao": "<descrição da fase da construção>"
+}
+Instruções:
+1. Compare as duas imagens visualmente.
+2. Calcule a porcentagem (0 a 100) que representa o quão semelhantes elas são.
+3. Liste em tópicos as diferenças entre o modelo e a construção real.
+4. Descreva em que fase da construção a foto enviada se encontra, considerando que o modelo corresponde a 100% (obra concluída).
+5. Desconsidere diferenças de cor e transparência.
+Retorne somente o JSON, sem explicações ou texto extra.`,
             },
             {
               type: "image_url",
@@ -38,22 +54,31 @@ export async function compareImages(imagePath1, imagePath2) {
     });
 
     let resultText = "";
+
     try {
       const msgContent = response.choices[0].message.content;
+
       if (typeof msgContent === "string") {
         resultText = msgContent.trim();
-      } else if (Array.isArray(msgContent) && msgContent.length > 0) {
-        const textBlock = msgContent.find((c) => c.type && c.type.includes("text"));
-        if (textBlock && textBlock.text) resultText = textBlock.text.trim();
-        else if (msgContent[0].text) resultText = msgContent[0].text.trim();
-      } else if (response.choices[0].message?.content?.[0]?.text) {
-        resultText = response.choices[0].message.content[0].text.trim();
+      } else if (Array.isArray(msgContent)) {
+        const textBlock = msgContent.find((c) => c.type === "text");
+        if (textBlock?.text) resultText = textBlock.text.trim();
       }
-    } catch (e) {
-      console.warn("Não foi possível extrair o texto da resposta do OpenAI:", e);
-    }
 
-    return { similarity: resultText };
+      // 🔹 Remove possíveis blocos de markdown ```json ... ```
+      resultText = resultText
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+      // 🔹 Faz o parse para objeto JSON real
+      const jsonResult = JSON.parse(resultText);
+
+      return { similarity: jsonResult };
+    } catch (e) {
+      console.warn("Erro ao interpretar JSON:", e, "\nConteúdo recebido:", resultText);
+      return { similarity: null, error: "Falha ao interpretar JSON" };
+    }
   } catch (error) {
     console.error("Erro na comparação de imagens:", error);
     throw new Error("Falha ao comparar imagens");

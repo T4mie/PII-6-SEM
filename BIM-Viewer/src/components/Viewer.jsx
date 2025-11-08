@@ -183,24 +183,26 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
         </button>
       </div>
 
-      {/* Barra de similaridade */}
+      {/* Resultado da comparação */}
       {similarity && (
-        <div style={{ marginTop: "40px" }}>
-          <h3>Similaridade entre as imagens</h3>
+        <div style={{ marginTop: "40px", textAlign: "center" }}>
+          <h3>Resultado da comparação</h3>
+
+          {/* Barra de progresso */}
           <div
             style={{
               width: "400px",
               height: "30px",
               borderRadius: "10px",
               background: "#ddd",
-              margin: "0 auto",
+              margin: "0 auto 20px",
               overflow: "hidden",
               position: "relative",
             }}
           >
             <div
               style={{
-                width: `${similarity.replace("%", "")}%`,
+                width: `${similarity.progresso}%`,
                 height: "100%",
                 background: "linear-gradient(90deg, #4caf50, #8bc34a)",
                 color: "white",
@@ -209,11 +211,31 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
                 transition: "width 1s ease-in-out",
               }}
             >
-              {similarity}
+              {similarity.progresso}%
             </div>
           </div>
+
+          {/* Diferenças */}
+          {similarity.diferencas && (
+            <div style={{ marginBottom: "15px" }}>
+              <h4>Diferenças encontradas:</h4>
+              <ul style={{ textAlign: "left", display: "inline-block" }}>
+                {similarity.diferencas.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Fase da construção */}
+          {similarity.fase_construcao && (
+            <p>
+              <strong>Fase da construção:</strong> {similarity.fase_construcao}
+            </p>
+          )}
         </div>
       )}
+
     </motion.div>
   );
 }

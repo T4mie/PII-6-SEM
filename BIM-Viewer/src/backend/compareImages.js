@@ -28,7 +28,8 @@ export async function compareImages(imagePath1, imagePath2) {
   "diferencas": [
     "<diferença 1>",
     "<diferença 2>",
-    "<diferença 3>"
+    "<diferença 3>",
+    "... mais diferenças se houver ..."
   ],
   "fase_construcao": "<descrição da fase da construção>"
 }

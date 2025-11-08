@@ -150,7 +150,7 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
           </div>
 
           {/* Seleção da imagem existente */}
-          <div className="collum">
+          <div className="collum" style={{maxHeight:"95%"}}>
             <h3>Selecione a foto da construção existente</h3>
 
             {/* Dropdown para pastas */}

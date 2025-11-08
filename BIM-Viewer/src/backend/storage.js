@@ -30,7 +30,7 @@ export async function uploadConstructionPhoto(file, codigo, isAdmin = false) {
   try {
     const fileRef = ref(storage, `construcoes/${codigo}/${file.name}`);
     await uploadBytes(fileRef, file);
-    let downloadURL = await getDownloaAdURL(fileRef);
+    let downloadURL = await getDownloadURL(fileRef);
 
     // ✅ Corrige URLs antigas (appspot → firebasestorage.app)
     downloadURL = downloadURL.replace("appspot.com", "firebasestorage.app");

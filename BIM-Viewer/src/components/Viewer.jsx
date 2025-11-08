@@ -1,3 +1,4 @@
+// src/components/Viewer.jsx
 import { useEffect, useRef, useState } from "react";
 
 export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl }) {
@@ -7,10 +8,10 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
   const [viewer, setViewer] = useState(null);
 
   // ✅ Corrigido — não altera mais o domínio (mantém firebasestorage.app)
-  function fixFirebaseUrl(url) {
-    if (!url) return url;
-    return url; // não faz replace, pois o domínio correto é firebasestorage.app
-  }
+  // function fixFirebaseUrl(url) {
+  //   if (!url) return url;
+  //   return url; // não faz replace, pois o domínio correto é firebasestorage.app
+  // }
 
   // Inicializa o Autodesk Viewer
   useEffect(() => {
@@ -80,12 +81,17 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
         console.log("Screenshot capturado!");
 
         // ✅ Usa URL original do Firebase (sem replace)
-        const fixedImageUrl = fixFirebaseUrl(imageUrl);
+        // const fixedImageUrl = fixFirebaseUrl(imageUrl);
 
         const formData = new FormData();
-        console.log("Baixando imagem via URL:", fixedImageUrl);
+        // console.log("Baixando imagem via URL:", fixedImageUrl);
 
-        const img1Response = await fetch(fixedImageUrl);
+        const img1Response = await fetch("https://pii-6-sem.onrender.com/api/fetch-image", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: imageUrl }),
+        });
+
         if (!img1Response.ok) throw new Error(`Falha ao baixar imagem Firebase (${img1Response.status})`);
         const img1 = await img1Response.blob();
 

@@ -148,6 +148,25 @@ app.post("/api/compare", upload.fields([{ name: "img1" }, { name: "img2" }]), as
   }
 });
 
+// backend.js
+app.post("/api/fetch-image", async (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ error: "URL ausente" });
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Falha ao baixar imagem");
+    const buffer = await response.arrayBuffer();
+
+    res.setHeader("Content-Type", response.headers.get("content-type") || "image/jpeg");
+    res.send(Buffer.from(buffer));
+  } catch (err) {
+    console.error("Erro ao buscar imagem:", err);
+    res.status(500).json({ error: "Falha ao buscar imagem" });
+  }
+});
+
+
 (async () => {
   try {
     token = await getToken(client_id, client_secret);

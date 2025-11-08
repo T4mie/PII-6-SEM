@@ -1,3 +1,4 @@
+// src/components/Photo_Upload.jsx
 import React, { useEffect, useState } from "react";
 import { MdAddAPhoto, MdCreateNewFolder } from "react-icons/md";
 import "../assets/css/photo_upload.css";

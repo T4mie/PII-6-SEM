@@ -126,59 +126,47 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
   }
 
   return (
-    <div style={{ textAlign: "center" }}>
-      <div
-        className="viewer-container"
-        style={{
-          height: "600px",
-          border: "1px solid #ccc",
-          borderRadius: "10px",
-          overflow: "hidden",
-        }}
-      >
-        <div ref={viewerDiv} className="viewer" style={{ height: "100%", width: "100%" }} />
+    <div  style={{ textAlign: "center" }}>
+      <div className="viewer-root">
+        <div className="viewer-divisor"></div>
+        <div
+          className="viewer-container"
+          style={{
+            height: "600px",
+            border: "1px solid #ccc",
+            borderRadius: "10px",
+            overflow: "hidden",
+          }}
+        >
+          <div ref={viewerDiv} className="viewer" style={{ height: "100%", width: "100%" }} />
+        </div>
+        <div className="viewer-divisor"></div>
+        {/* Mostra imagem enviada */}
+        <div className="viewer-container" style={{height:"600px",borderRadius: "10px"}}>
+          {imageUrl && (
+            <div style={{width:"100%",height:"100%"}}>
+              <img
+                src={fixFirebaseUrl(imageUrl)}
+                alt="Imagem enviada"
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "100%",
+                }}
+              />
+            </div>
+          )}
+        </div>
+        <div className="viewer-divisor"></div>
       </div>
 
-      {/* Mostra imagem enviada */}
-      {imageUrl && (
-        <div style={{ marginTop: "25px" }}>
-          <h4>Imagem enviada:</h4>
-          <img
-            src={fixFirebaseUrl(imageUrl)}
-            alt="Imagem enviada"
-            style={{
-              maxWidth: "400px",
-              borderRadius: "10px",
-              boxShadow: "0 0 10px rgba(0,0,0,0.3)",
-            }}
-          />
-        </div>
-      )}
-
-      {/* Mostra screenshot capturado */}
-      {screenshotUrl && (
-        <div style={{ marginTop: "25px" }}>
-          <h4>Último screenshot:</h4>
-          <img
-            src={screenshotUrl}
-            alt="Screenshot do modelo"
-            style={{
-              maxWidth: "500px",
-              borderRadius: "10px",
-              boxShadow: "0 0 10px rgba(0,0,0,0.3)",
-            }}
-          />
-        </div>
-      )}
-
       {/* Botão de comparação */}
-      <div style={{ marginTop: "30px" }}>
+      <div>
         <button
           onClick={handleCompare}
           disabled={!imageUrl || isComparing}
           style={{
             padding: "12px 25px",
-            background: "#4caf50",
+            background: "#4b5ebeff",
             color: "white",
             border: "none",
             borderRadius: "8px",

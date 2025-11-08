@@ -1,12 +1,24 @@
+select option { 
+    background-color: #122454;
+}
+
 .container {
     display: flex;              
     flex-direction: row;         
     justify-content: center;     
     align-items: center;         
     width: 100vw;
-    height: 100vh;
+    height: 90vh;
 }
 
+.upload-screen {
+    display: flex;              
+    flex-direction: row;         
+    justify-content: center;     
+    align-items: center;         
+    width: 100%;
+    height: 100%;
+}
 .collum {
     flex: 2;
     display: flex;
@@ -54,6 +66,7 @@
 
 .divisor{
     flex: 1;
+
 }
 
 .icon-container {
@@ -67,3 +80,8 @@
 
 }
 
+.advance-button {
+    display: flex;
+    width: 100vw;
+    justify-content: center;
+}

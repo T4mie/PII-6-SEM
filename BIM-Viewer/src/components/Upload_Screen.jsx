@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import "../assets/css/upload_screen.css";
 import { FaFileUpload } from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Mosaic } from "react-loading-indicators";
@@ -66,16 +67,20 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
     setIconFile(<Mosaic color="white" size="medium" />);
     try {
       const file = e.target.files[0];
+      const extension = file.name.split(".").pop().toLowerCase();
       if (!file) return;
       await onUploadFile(file); // mantém como Blob
       setFileUploaded(true);
       if (imageSelected) navigate("/viewer");
     } catch (err) {
+      setIconFile(
+        <FaTimesCircle size={48} color="white" style={{ position: "absolute" }} />
+      );
       console.error("Erro no upload de arquivo:", err);
       alert("Erro ao enviar arquivo.");
     } finally {
       setIconFile(
-        <FaFileUpload size={48} color="white" style={{ position: "absolute" }} />
+        <FaCheckCircle size={48} color="white" style={{ position: "absolute" }} />
       );
     }
   }
@@ -118,98 +123,98 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
 
   return (
     <motion.div
-      className="container"
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7 }}
-    >
-      <div className="divisor"></div>
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+      >
+      <div
+        className="container"
+      >
+          <div className="divisor"></div>
 
-      {/* Upload do modelo */}
-      <div className="collum">
-        <h2>Insira o modelo da construção</h2>
-        <motion.div
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          className="select-box"
-        >
-          <label htmlFor="file_upload"></label>
-          <input type="file" id="file_upload" onChange={handleFile} />
-          <div className="icon-container">{icon_file}</div>
-        </motion.div>
-      </div>
-
-      <div className="divisor"></div>
-
-      {/* Seleção da imagem existente */}
-      <div className="collum">
-        <h2>Selecione a foto da construção existente</h2>
-
-        {/* Dropdown para pastas */}
-        <select
-          className="photo-upload-input"
-          value={selectedFolder}
-          onChange={(e) => {
-            setSelectedFolder(e.target.value);
-            setSelectedImage("");
-            setPreviewURL("");
-          }}
-        >
-          <option value="">Selecione uma construção</option>
-          {folders.map((folder) => (
-            <option key={folder} value={folder}>
-              {folder}
-            </option>
-          ))}
-        </select>
-
-        {/* Dropdown para imagens */}
-        {selectedFolder && (
-          <select
-            className="photo-upload-input"
-            value={selectedImage}
-            onChange={(e) => setSelectedImage(e.target.value)}
-          >
-            <option value="">Selecione uma imagem</option>
-            {images.map((img) => (
-              <option key={img} value={img}>
-                {img}
-              </option>
-            ))}
-          </select>
-        )}
-
-        {/* Pré-visualização da imagem */}
-        {previewURL && (
-          <div
-            className="preview-container"
-            style={{ marginTop: "10px", textAlign: "center" }}
-          >
-            <img
-              src={previewURL}
-              alt="Pré-visualização"
-              style={{
-                width: "220px",
-                height: "auto",
-                borderRadius: "8px",
-                boxShadow: "0 0 10px rgba(0,0,0,0.3)",
-              }}
-            />
+          {/* Upload do modelo */}
+          <div className="collum">
+            <h2>Insira o modelo da construção</h2>
+            <motion.div
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="select-box"
+            >
+              <label htmlFor="file_upload"></label>
+              <input type="file" id="file_upload" onChange={handleFile} />
+              <div className="icon-container">{icon_file}</div>
+            </motion.div>
           </div>
-        )}
 
-        <motion.div
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          className="select-box"
-          onClick={handleSelectImage}
-          style={{ cursor: "pointer" }}
-        >
-          <div className="icon-container">{icon_img}</div>
-        </motion.div>
+          <div className="divisor">
+          </div>
+
+          {/* Seleção da imagem existente */}
+          <div className="collum">
+            <h2>Selecione a foto da construção existente</h2>
+
+            {/* Dropdown para pastas */}
+            <select
+              className="photo-upload-input"
+              value={selectedFolder}
+              onChange={(e) => {
+                setSelectedFolder(e.target.value);
+                setSelectedImage("");
+                setPreviewURL("");
+              }}
+            >
+              <option value="">Selecione uma construção</option>
+              {folders.map((folder) => (
+                <option key={folder} value={folder}>
+                  {folder}
+                </option>
+              ))}
+            </select>
+
+            {/* Dropdown para imagens */}
+            {selectedFolder && (
+              <select
+                className="photo-upload-input"
+                value={selectedImage}
+                onChange={(e) => setSelectedImage(e.target.value)}
+              >
+                <option value="">Selecione uma imagem</option>
+                {images.map((img) => (
+                  <option key={img} value={img}>
+                    {img}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {/* Pré-visualização da imagem */}
+            {previewURL && (
+              <div
+                className="preview-container"
+                style={{ marginTop: "10px", textAlign: "center" }}
+              >
+                <img
+                  src={previewURL}
+                  alt="Pré-visualização"
+                  style={{
+                    width: "220px",
+                    height: "auto",
+                    borderRadius: "8px",
+                    boxShadow: "0 0 10px rgba(0,0,0,0.3)",
+                  }}
+                />
+              </div>
+            )}
+            <button onClick={handleSelectImage} style={{background: "#4b5ebeff",width: "100%",}}>
+              Selecionar Imagem
+            </button>
+          </div>
+
+          <div className="divisor"></div>
       </div>
-
-      <div className="divisor"></div>
+      <div className="advance-button">
+        <button style={{background: "#4b5ebeff",}}>Enviar para Comparação</button>
+      </div>
     </motion.div>
   );
 }

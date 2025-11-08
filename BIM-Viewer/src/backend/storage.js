@@ -1,5 +1,5 @@
 // storage.js
-import { ref, listAll, uploadBytes, getDownloadURL, getStorage } from "firebase/storage";
+import { ref, listAll, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "./firebase.js";
 
 /**
@@ -37,7 +37,12 @@ export async function uploadConstructionPhoto(file, codigo, isAdmin = false) {
   try {
     const fileRef = ref(storage, `construcoes/${codigo}/${file.name}`);
     await uploadBytes(fileRef, file);
-    const downloadURL = await getDownloadURL(fileRef);
+    let downloadURL = await getDownloadURL(fileRef);
+
+    // 🔧 Corrige URLs com domínio incorreto (ex: .app → .appspot.com)
+    downloadURL = downloadURL.replace("firebasestorage.app", "appspot.com");
+
+    console.log("Imagem enviada com sucesso:", downloadURL);
     return downloadURL;
   } catch (error) {
     console.error("Erro no upload da imagem:", error);
@@ -70,7 +75,6 @@ export async function createEmptyFolder(codigo) {
   if (!codigo) throw new Error("Código inválido para criação de pasta");
 
   try {
-    // Cria um arquivo "vazio" dentro da pasta
     const placeholderRef = ref(storage, `construcoes/${codigo}/.placeholder`);
     const placeholderContent = new Blob([""], { type: "text/plain" });
     await uploadBytes(placeholderRef, placeholderContent);
@@ -81,13 +85,22 @@ export async function createEmptyFolder(codigo) {
   }
 }
 
+/**
+ * Lista imagens dentro de uma pasta específica
+ */
 export async function listImagesInFolder(folderName) {
   const folderRef = ref(storage, `construcoes/${folderName}`);
   const res = await listAll(folderRef);
   return res.items.map((item) => item.name);
 }
 
+/**
+ * Obtém a URL de uma imagem no Firebase Storage
+ */
 export async function getImageURL(folderName, imageName) {
   const imageRef = ref(storage, `construcoes/${folderName}/${imageName}`);
-  return await getDownloadURL(imageRef);
+  let url = await getDownloadURL(imageRef);
+  // 🔧 Corrige domínio, se necessário
+  url = url.replace("firebasestorage.app", "appspot.com");
+  return url;
 }

@@ -38,7 +38,7 @@ Instruções:
 2. Calcule a porcentagem (0 a 100) que representa o quão semelhantes elas são.
 3. Liste em tópicos as diferenças entre o modelo e a construção real.
 4. Descreva em que fase da construção a foto enviada se encontra, considerando que o modelo corresponde a 100% (obra concluída).
-5. Desconsidere diferenças de cor e transparência.
+5. Desconsidere diferenças de cor, transparência e material (IMPORTANTE).
 Retorne somente o JSON, sem explicações ou texto extra.`,
             },
             {

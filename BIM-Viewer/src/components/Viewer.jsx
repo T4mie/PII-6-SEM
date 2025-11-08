@@ -137,7 +137,7 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
         <div
           className="viewer-container"
           style={{
-            height: "600px",
+            height: "90%",
             border: "1px solid #ccc",
             borderRadius: "10px",
             overflow: "hidden",
@@ -147,7 +147,7 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
         </div>
         <div className="viewer-divisor"></div>
         {/* Mostra imagem enviada */}
-        <div className="viewer-container" style={{height:"600px",borderRadius: "10px"}}>
+        <div className="viewer-container" style={{height:"90%",borderRadius: "10px"}}>
           {imageUrl && (
             <div style={{width:"100%",height:"100%",justifyContent:"center", objectFit:"scale-down;", display:"flex", alignItems:"center"}}>
               <img
@@ -185,7 +185,7 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
 
       {/* Resultado da comparação */}
       {similarity && (
-        <div style={{ marginTop: "40px", textAlign: "center" }}>
+        <div style={{ marginTop: "40px"}}>
           <h3>Resultado da comparação</h3>
 
           {/* Barra de progresso */}

@@ -1,5 +1,6 @@
 // src/components/Viewer.jsx
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl }) {
   const viewerDiv = useRef(null);
@@ -126,7 +127,11 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
   }
 
   return (
-    <div  style={{ textAlign: "center" }}>
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7 }}
+    >
       <div className="viewer-root">
         <div className="viewer-divisor"></div>
         <div
@@ -160,7 +165,7 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
       </div>
 
       {/* Botão de comparação */}
-      <div>
+      <div className="viewer-button">
         <button
           onClick={handleCompare}
           disabled={!imageUrl || isComparing}
@@ -209,6 +214,6 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

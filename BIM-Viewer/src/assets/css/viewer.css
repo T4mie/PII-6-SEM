@@ -24,6 +24,12 @@
   height: 100%;
 }
 
+.viewer-button {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+}
+
 .overlay {
   position: absolute;
   top: 10px;

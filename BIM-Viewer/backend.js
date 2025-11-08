@@ -27,44 +27,27 @@ const allowedOrigins = [
 
 dotenv.config();
 
-// Configuração do multer para upload temporário
+// ⚙️ Configuração global de middlewares
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+}));
+
+// ✅ Necessário para interpretar JSON no corpo das requisições
+app.use(express.json());
+
+// Configuração do multer
 const upload = multer({ dest: "uploads/" });
 
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // Permite requisições sem "origin" (ex: Postman, backend interno)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-}));
-
-// app.use(cors({
-//   origin: (origin, callback) => {
-//     console.log("[CORS] Origin recebida:", origin);
-//     callback(null, true); // permitir todas temporariamente
-//   },
-//   credentials: true,
-// }));
-
-// app.use((req, res, next) => {
-//   console.log(`📥 [${req.method}] ${req.originalUrl} - Origem: ${req.headers.origin || "sem origem"}`);
-//   next();
-// });
-
 app.get("/api/token", async (req, res) => {
   try {
-    // console.log("[REQ] /api/token chamado");
-    // console.log("Origem da requisição:", req.headers.origin || "sem origem");
-    // console.log("URL completa:", req.protocol + "://" + req.get("host") + req.originalUrl);
-
     if (!token) {
       console.warn("Token ainda não inicializado no servidor!");
       return res.status(500).json({ error: "Token não disponível no momento" });
@@ -78,17 +61,12 @@ app.get("/api/token", async (req, res) => {
 
 app.post("/upload/image", upload.single("file"), async (req, res) => {
   try {
-    // Caso venha via Firebase (URL string)
     if (req.body.imageUrl) {
       console.log("Recebida URL de imagem do Firebase:", req.body.imageUrl);
       return res.json({ imageUrl: req.body.imageUrl });
     }
 
-    // Caso venha via arquivo físico (upload comum)
-    if (!req.file) {
-      throw new Error("Nenhum arquivo ou URL enviado.");
-    }
-
+    if (!req.file) throw new Error("Nenhum arquivo ou URL enviado.");
     console.log("Fazendo upload da imagem:", req.file.originalname);
 
     const result = await uploadImage(token, req.file.path);
@@ -100,7 +78,6 @@ app.post("/upload/image", upload.single("file"), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 
 app.post("/upload/file", upload.single("file"), async (req, res) => {
   try {
@@ -133,9 +110,7 @@ app.post("/api/compare", upload.fields([{ name: "img1" }, { name: "img2" }]), as
     const img1 = req.files?.["img1"]?.[0]?.path;
     const img2 = req.files?.["img2"]?.[0]?.path;
 
-    if (!img1 || !img2) {
-      throw new Error("Arquivos não recebidos corretamente pelo servidor");
-    }
+    if (!img1 || !img2) throw new Error("Arquivos não recebidos corretamente pelo servidor");
 
     const result = await compareImages(img1, img2);
     fs.unlinkSync(img1);
@@ -148,7 +123,7 @@ app.post("/api/compare", upload.fields([{ name: "img1" }, { name: "img2" }]), as
   }
 });
 
-// backend.js
+// ✅ Corrigido — agora req.body.url será reconhecido corretamente
 app.post("/api/fetch-image", async (req, res) => {
   const { url } = req.body;
   if (!url) return res.status(400).json({ error: "URL ausente" });
@@ -166,7 +141,6 @@ app.post("/api/fetch-image", async (req, res) => {
   }
 });
 
-
 (async () => {
   try {
     token = await getToken(client_id, client_secret);
@@ -176,7 +150,6 @@ app.post("/api/fetch-image", async (req, res) => {
     console.error("Falha ao criar token/bucket no início:", err);
   }
 })();
-
 
 app.listen(port, () =>
   console.log(`Servidor rodando em http://localhost:${port}`)

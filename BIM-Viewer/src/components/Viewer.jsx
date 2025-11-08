@@ -149,7 +149,7 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
         {/* Mostra imagem enviada */}
         <div className="viewer-container" style={{height:"600px",borderRadius: "10px"}}>
           {imageUrl && (
-            <div style={{width:"100%",height:"100%",justifyContent:"center", objectFit:"contain", display:"flex", alignItems:"center"}}>
+            <div style={{width:"100%",height:"100%",justifyContent:"center", objectFit:"scale-down;", display:"flex", alignItems:"center"}}>
               <img
                 src={fixFirebaseUrl(imageUrl)}
                 alt="Imagem enviada"

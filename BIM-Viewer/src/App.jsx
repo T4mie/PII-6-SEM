@@ -40,24 +40,40 @@ function App() {
   }
 
   // Upload de imagem
-  async function uploadImage(file) {
-    if (!file) return;
-    const formData = new FormData();
-    formData.append("file", file);
+async function uploadImage(fileOrUrl) {
+  if (!fileOrUrl) return;
 
+  // 🧠 Caso seja uma URL string (vinda do Firebase)
+  if (typeof fileOrUrl === "string") {
+    const formData = new FormData();
+    formData.append("imageUrl", fileOrUrl); // 👉 agora o backend reconhece
     const resp = await fetch("https://pii-6-sem.onrender.com/upload/image", {
       method: "POST",
       body: formData,
     });
-
     const data = await resp.json();
-    if (data.imageUrl) {
-      setImageUrl(data.imageUrl);
-      console.log("Imagem enviada:", data.imageUrl);
-    } else {
-      console.error("Falha no upload:", data);
-    }
+    if (data.imageUrl) setImageUrl(data.imageUrl);
+    else console.error("Falha no upload:", data);
+    return;
   }
+
+  // 🧱 Caso seja arquivo físico (File Blob)
+  const formData = new FormData();
+  formData.append("file", fileOrUrl);
+
+  const resp = await fetch("https://pii-6-sem.onrender.com/upload/image", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await resp.json();
+  if (data.imageUrl) {
+    setImageUrl(data.imageUrl);
+    console.log("Imagem enviada:", data.imageUrl);
+  } else {
+    console.error("Falha no upload:", data);
+  }
+}
 
   return (
     <HashRouter>

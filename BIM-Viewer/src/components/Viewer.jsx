@@ -6,6 +6,12 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
   const [isComparing, setIsComparing] = useState(false);
   const [viewer, setViewer] = useState(null);
 
+  // 🔧 Corrige domínio errado do Firebase Storage
+  function fixFirebaseUrl(url) {
+    if (!url) return url;
+    return url.replace("firebasestorage.app", "appspot.com");
+  }
+
   // Inicializa o Autodesk Viewer
   useEffect(() => {
     const options = {
@@ -73,12 +79,24 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
         setScreenshotUrl(blobURL);
         console.log("Screenshot capturado!");
 
+        // 🔧 Corrige URL do Firebase antes de fazer o fetch
+        const fixedImageUrl = fixFirebaseUrl(imageUrl);
+
         const formData = new FormData();
-        const img1 = await fetch(imageUrl).then((r) => r.blob());
-        const img2 = await fetch(blobURL).then((r) => r.blob());
+        console.log("Baixando imagem via URL corrigida:", fixedImageUrl);
+
+        const img1Response = await fetch(fixedImageUrl);
+        if (!img1Response.ok) throw new Error(`Falha ao baixar imagem Firebase (${img1Response.status})`);
+        const img1 = await img1Response.blob();
+
+        const img2Response = await fetch(blobURL);
+        if (!img2Response.ok) throw new Error(`Falha ao capturar screenshot (${img2Response.status})`);
+        const img2 = await img2Response.blob();
 
         formData.append("img1", img1, "imagem1.jpg");
         formData.append("img2", img2, "imagem2.jpg");
+
+        console.log("Enviando imagens para comparação...");
 
         const resp = await fetch("https://pii-6-sem.onrender.com/api/compare", {
           method: "POST",
@@ -94,6 +112,7 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
         }
       } catch (err) {
         console.error("Erro ao comparar imagens:", err);
+        alert("Falha ao comparar imagens. Verifique se a imagem está acessível publicamente no Firebase.");
       } finally {
         setIsComparing(false);
       }
@@ -119,7 +138,7 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
         <div style={{ marginTop: "25px" }}>
           <h4>Imagem enviada:</h4>
           <img
-            src={imageUrl}
+            src={fixFirebaseUrl(imageUrl)}
             alt="Imagem enviada"
             style={{
               maxWidth: "400px",

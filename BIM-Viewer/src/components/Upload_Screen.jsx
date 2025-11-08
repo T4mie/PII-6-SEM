@@ -16,7 +16,6 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
   const [icon_file, setIconFile] = useState(
     <FaFileUpload size={48} color="white" style={{ position: "absolute" }} />
   );
-
   const [icon_img, setIconImg] = useState(
     <FaFileUpload size={48} color="white" style={{ position: "absolute" }} />
   );
@@ -62,31 +61,45 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
     fetchImages();
   }, [selectedFolder]);
 
+  // 🧱 Upload do arquivo Blob (modelo)
   async function handleFile(e) {
     setIconFile(<Mosaic color="white" size="medium" />);
-    const success = await onUploadFile(e);
-    if (success) setFileUploaded(true);
-    if (success && imageSelected) navigate("/viewer");
-    setIconFile(<FaFileUpload size={48} color="white" style={{ position: "absolute" }} />);
+    try {
+      const file = e.target.files[0];
+      if (!file) return;
+      await onUploadFile(file); // mantém como Blob
+      setFileUploaded(true);
+      if (imageSelected) navigate("/viewer");
+    } catch (err) {
+      console.error("Erro no upload de arquivo:", err);
+      alert("Erro ao enviar arquivo.");
+    } finally {
+      setIconFile(
+        <FaFileUpload size={48} color="white" style={{ position: "absolute" }} />
+      );
+    }
   }
 
+  // 🖼️ Seleção de imagem (como URL do Firebase)
   async function handleSelectImage() {
     if (!selectedImage) return alert("Selecione uma imagem primeiro!");
     setIconImg(<Mosaic color="white" size="medium" />);
     try {
       const imageUrl = await getImageURL(selectedFolder, selectedImage);
-      await onUploadImage(imageUrl);
+      await onUploadImage(imageUrl); // envia como string (URL)
       setImageSelected(true);
       if (fileUploaded) navigate("/viewer");
     } catch (err) {
       console.error("Erro ao carregar imagem:", err);
       alert("Erro ao selecionar imagem.");
     } finally {
-      setIconImg(<FaFileUpload size={48} color="white" style={{ position: "absolute" }} />);
+      setIconImg(
+        <FaFileUpload size={48} color="white" style={{ position: "absolute" }} />
+      );
     }
   }
 
-  // 👁️ Pré-visualizar a imagem selecionada
+  // 👁️ Pré-visualização da imagem
   useEffect(() => {
     async function previewSelectedImage() {
       if (!selectedFolder || !selectedImage) {
@@ -112,9 +125,14 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
     >
       <div className="divisor"></div>
 
+      {/* Upload do modelo */}
       <div className="collum">
         <h2>Insira o modelo da construção</h2>
-        <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="select-box">
+        <motion.div
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          className="select-box"
+        >
           <label htmlFor="file_upload"></label>
           <input type="file" id="file_upload" onChange={handleFile} />
           <div className="icon-container">{icon_file}</div>
@@ -123,6 +141,7 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
 
       <div className="divisor"></div>
 
+      {/* Seleção da imagem existente */}
       <div className="collum">
         <h2>Selecione a foto da construção existente</h2>
 
@@ -162,7 +181,10 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
 
         {/* Pré-visualização da imagem */}
         {previewURL && (
-          <div className="preview-container" style={{ marginTop: "10px", textAlign: "center" }}>
+          <div
+            className="preview-container"
+            style={{ marginTop: "10px", textAlign: "center" }}
+          >
             <img
               src={previewURL}
               alt="Pré-visualização"

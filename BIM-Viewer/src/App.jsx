@@ -18,7 +18,7 @@ function App() {
     if (!file) return;
     setIsLoading(true);
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", file);  
 
     try {
       const resp = await fetch("https://pii-6-sem.onrender.com/upload/file", {

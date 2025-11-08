@@ -78,12 +78,20 @@ app.get("/api/token", async (req, res) => {
 
 app.post("/upload/image", upload.single("file"), async (req, res) => {
   try {
+    // Caso venha via Firebase (URL string)
+    if (req.body.imageUrl) {
+      console.log("Recebida URL de imagem do Firebase:", req.body.imageUrl);
+      return res.json({ imageUrl: req.body.imageUrl });
+    }
+
+    // Caso venha via arquivo físico (upload comum)
+    if (!req.file) {
+      throw new Error("Nenhum arquivo ou URL enviado.");
+    }
+
     console.log("Fazendo upload da imagem:", req.file.originalname);
 
-    // Faz upload da imagem
     const result = await uploadImage(token, req.file.path);
-
-    // Remove o arquivo temporário local
     fs.unlinkSync(req.file.path);
 
     res.json(result);
@@ -92,6 +100,7 @@ app.post("/upload/image", upload.single("file"), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 app.post("/upload/file", upload.single("file"), async (req, res) => {
   try {

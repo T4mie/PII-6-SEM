@@ -185,54 +185,56 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
 
       {/* Resultado da comparação */}
       {similarity && (
-        <div style={{ marginTop: "40px"}}>
-          <h3>Resultado da comparação</h3>
+        <div className="viewer-similarity-root"> 
+          <div className="viewer-similarity-container" >
+            <h3>Resultado da comparação</h3>
 
-          {/* Barra de progresso */}
-          <div
-            style={{
-              width: "400px",
-              height: "30px",
-              borderRadius: "10px",
-              background: "#ddd",
-              margin: "0 auto 20px",
-              overflow: "hidden",
-              position: "relative",
-            }}
-          >
+            {/* Barra de progresso */}
             <div
               style={{
-                width: `${similarity.progresso}%`,
-                height: "100%",
-                background: "linear-gradient(90deg, #4caf50, #8bc34a)",
-                color: "white",
-                fontWeight: "bold",
-                lineHeight: "30px",
-                transition: "width 1s ease-in-out",
+                width: "400px",
+                height: "30px",
+                borderRadius: "10px",
+                background: "#ddd",
+                margin: "0 auto 20px",
+                overflow: "hidden",
+                position: "relative",
               }}
             >
-              {similarity.progresso}%
+              <div
+                style={{
+                  width: `${similarity.progresso}%`,
+                  height: "100%",
+                  background: "linear-gradient(90deg, #4caf50, #8bc34a)",
+                  color: "white",
+                  fontWeight: "bold",
+                  lineHeight: "30px",
+                  transition: "width 1s ease-in-out",
+                }}
+              >
+                {similarity.progresso}%
+              </div>
             </div>
+
+            {/* Diferenças */}
+            {similarity.diferencas && (
+              <div style={{ marginBottom: "15px" }}>
+                <h4>Diferenças encontradas:</h4>
+                <ul style={{ textAlign: "left", display: "inline-block" }}>
+                  {similarity.diferencas.map((item, idx) => (
+                    <li key={idx}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Fase da construção */}
+            {similarity.fase_construcao && (
+              <p>
+                <strong>Fase da construção:</strong> {similarity.fase_construcao}
+              </p>
+            )}
           </div>
-
-          {/* Diferenças */}
-          {similarity.diferencas && (
-            <div style={{ marginBottom: "15px" }}>
-              <h4>Diferenças encontradas:</h4>
-              <ul style={{ textAlign: "left", display: "inline-block" }}>
-                {similarity.diferencas.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Fase da construção */}
-          {similarity.fase_construcao && (
-            <p>
-              <strong>Fase da construção:</strong> {similarity.fase_construcao}
-            </p>
-          )}
         </div>
       )}
 

@@ -1,6 +1,7 @@
 // src/components/Viewer.jsx
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { CiExport } from "react-icons/ci";
 
 export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl }) {
   const viewerDiv = useRef(null);
@@ -215,7 +216,9 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
                 {similarity.progresso}%
               </div>
             </div>
-
+            <button style={{background: "#4b5ebeff",top:"24px", right:"24px", position:"absolute"}}>
+              <CiExport size={"30px"}/>
+            </button>
             {/* Diferenças */}
             {similarity.diferencas && (
               <div style={{ marginBottom: "15px" }}>

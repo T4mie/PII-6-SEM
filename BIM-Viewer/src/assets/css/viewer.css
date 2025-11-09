@@ -38,7 +38,7 @@
 
 .viewer-similarity-container {
  margin-top: 10px;
- width: 70vw;
+ width: 60vw;
  text-align: center;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 16px;
@@ -53,3 +53,7 @@
     display: flex;
     justify-content: center;
   }
+
+button:hover{
+  background: rgb(59, 76, 161);
+}

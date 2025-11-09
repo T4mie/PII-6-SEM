@@ -84,4 +84,12 @@ select option {
     display: flex;
     width: 100vw;
     justify-content: center;
+    
+}
+.advance-button button {
+    background:#4b5ebeff;
+}
+
+.advance-button button:hover {
+    background: rgb(59, 76, 161);
 }

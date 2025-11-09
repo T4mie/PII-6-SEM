@@ -150,7 +150,7 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
           </div>
 
           {/* Seleção da imagem existente */}
-          <div className="collum" style={{maxHeight:"95%"}}>
+          <div className="collum">
             <h3>Selecione a foto da construção existente</h3>
 
             {/* Dropdown para pastas */}
@@ -191,14 +191,14 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
             {previewURL && (
               <div
                 className="preview-container"
-                style={{ marginTop: "10px", textAlign: "center" }}
+                style={{ marginTop: "8px", textAlign: "center" }}
               >
                 <img
                   src={previewURL}
                   alt="Pré-visualização"
                   style={{
                     width: "220px",
-                    height: "auto",
+                    height: "80%",
                     borderRadius: "8px",
                     boxShadow: "0 0 10px rgba(0,0,0,0.3)",
                   }}
@@ -211,7 +211,7 @@ export default function Upload_Screen({ onUploadFile, onUploadImage, isLoading }
           <div className="divisor"></div>
       </div>
       <div className="advance-button">
-        <button onClick={handleSelectImage} style={{background: "#4b5ebeff",}}>Enviar para Comparação</button>
+        <button onClick={handleSelectImage}>Enviar para Comparação</button>
       </div>
     </motion.div>
   );

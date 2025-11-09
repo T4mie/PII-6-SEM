@@ -114,10 +114,10 @@ export default function PhotoUpload() {
               title="Criar nova construção"
               onClick={() => setCreatingNew(!creatingNew)}
               style={{
-                backgroundColor: "#1e88e5",
+                backgroundColor: "#4b5ebeff",
                 border: "none",
                 borderRadius: "8px",
-                padding: "8px 10px",
+                padding: "10px 10px",
                 cursor: "pointer",
               }}
             >
@@ -164,7 +164,7 @@ export default function PhotoUpload() {
           />
         </div>
 
-        <button onClick={handleUpload} disabled={loading} style={{background: "#4b5ebeff",}}>
+        <button onClick={handleUpload} disabled={loading} style={{background: "#4b5ebeff", marginTop: "12px"}}>
           {loading ? "Enviando..." : "Enviar Imagem"}
         </button>
 

@@ -171,13 +171,6 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
           onClick={handleCompare}
           disabled={!imageUrl || isComparing}
           style={{
-            padding: "12px 25px",
-            background: "#4b5ebeff",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            cursor: "pointer",
           }}
         >
           {isComparing ? "Comparando..." : "Comparar Imagens"}
@@ -216,7 +209,7 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
                 {similarity.progresso}%
               </div>
             </div>
-            <button style={{background: "#4b5ebeff",top:"24px", right:"24px", position:"absolute"}}>
+            <button style={{top:"24px", right:"24px", position:"absolute"}}>
               <CiExport size={"30px"}/>
             </button>
             {/* Diferenças */}

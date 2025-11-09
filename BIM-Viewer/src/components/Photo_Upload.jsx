@@ -135,7 +135,7 @@ export default function PhotoUpload() {
               onChange={(e) => setNewFolderName(e.target.value)}
               className="photo-upload-input"
             />
-            <button onClick={handleCreateFolder}>Criar pasta</button>
+            <button onClick={handleCreateFolder} style={{background: "#4b5ebeff",}}>Criar pasta</button>
           </div>
         )}
 
@@ -164,7 +164,7 @@ export default function PhotoUpload() {
           />
         </div>
 
-        <button onClick={handleUpload} disabled={loading}>
+        <button onClick={handleUpload} disabled={loading} style={{background: "#4b5ebeff",}}>
           {loading ? "Enviando..." : "Enviar Imagem"}
         </button>
 

@@ -22,23 +22,22 @@ export async function compareImages(imagePath1, imagePath2) {
           content: [
             {
               type: "text",
-              text: `Você faz parte de um sistema automatizado de monitoração de canteiro de obras que apenas avalia o andamento da obra, independente da cor e do material. Compare visualmente a foto da construção real com a imagem do modelo do projeto e retorne apenas um JSON no seguinte formato:
+              text: `Você é um analista senior que é responsável por monitorar os canteiro de obras da sua empresa e avaliar o andamento da obra a partir da comparação de uma imagem de um modelo 2d da obra e uma foto tirada do canteiro, desconsiderando as diferenças de cor, material e transparência entre os dois. Compare visualmente a foto da construção real com a imagem do modelo do projeto e retorne apenas um JSON no seguinte formato:
 {
   "progresso": "<porcentagem de similaridade de 0 a 100>",
   "diferencas": [
     "<diferença 1>",
     "<diferença 2>",
-    "<diferença 3>",
-    "... mais diferenças se houver ..."
+    "<diferença 3>"
   ],
   "fase_construcao": "<descrição da fase da construção>"
 }
 Instruções:
 1. Compare a imagem da construção real com a do modelo 3d, entendendo que é uma verificação do andamento de uma obra real.
 2. Calcule a porcentagem (0 a 100) que representa o quão semelhantes a cosntrução real está do modelo do projeto, com o objetivo de entender o progresso da obra, o que está faltando e o que está distoante do objetivo original do projeto.
-3. Liste em tópicos as diferenças entre o modelo 3d e a construção real, não considerando as cores, material nem transparência.
+3. A primeira e a segunda diferença devem envolver aspectos estruturais (ex: paredes, colunas, vigas), e a terceira deve envolver aspectos arquitetônicos (ex: janelas, portas, acabamentos).
 4. Descreva em que fase da construção a foto enviada se encontra, considerando que o modelo corresponde a 100% (obra concluída).
-5. Desconsidere as diferenças de cor, transparência e material, pois estamos utilizando um mock para representar a construção real.
+5. IMPORTANTE: Desconsidere as diferenças de cor, transparência e material em todas as diferenças, pois estamos utilizando um mock para representar a construção real. Há uma flor tanto no modelo 3d quanto da foto real, ignore-a.
 Retorne somente o JSON, sem explicações ou texto extra.`,
             },
             {

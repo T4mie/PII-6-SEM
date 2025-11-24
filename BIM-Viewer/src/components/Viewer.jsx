@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { CiExport } from "react-icons/ci";
+import ExportImage from "../assets/img/MetroLogo.png"
 import jsPDF from "jspdf";
 
 export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl }) {
@@ -136,6 +137,9 @@ function exportPDF() {
 
   const doc = new jsPDF();
 
+  const logo = new Image();
+  logo.src = ExportImage
+
   const pageWidth = doc.internal.pageSize.width;
   const margin = 15;
   const boxX = margin;
@@ -267,6 +271,9 @@ function exportPDF() {
                 position: "relative",
               }}
             >
+              <div style={{width:"100%", height:"100%",alignContent:"center",position:"absolute",justifyContent:"center",color:"black"}}>
+                  {similarity.progresso}%
+                </div>
               <div
                 style={{
                   width: `${similarity.progresso}%`,
@@ -277,9 +284,10 @@ function exportPDF() {
                   lineHeight: "30px",
                   transition: "width 1s ease-in-out",
                 }}
-              >
-                {similarity.progresso}%
+              >     
+                
               </div>
+              
             </div>
             {/* Botão de exportar */}
             <button onClick={exportPDF} style={{top:"24px", right:"24px", position:"absolute"}}>

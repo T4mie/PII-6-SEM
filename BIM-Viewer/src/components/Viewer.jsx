@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { CiExport } from "react-icons/ci";
+import jsPDF from "jspdf";
 
 export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl }) {
   const viewerDiv = useRef(null);
@@ -127,6 +128,37 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
     });
   }
 
+  function exportPDF() {
+  if (!similarity) {
+    alert("Nenhum resultado para exportar!");
+    return;
+  }
+
+  const doc = new jsPDF();
+
+  doc.setFontSize(18);
+  doc.text("Relatório de Diferenças", 14, 20);
+
+  doc.setFontSize(14);
+  doc.text(`Similaridade: ${similarity.progresso}%`, 14, 35);
+
+  if (similarity.diferencas && similarity.diferencas.length > 0) {
+    doc.text("Diferenças encontradas:", 14, 50);
+
+    let y = 58;
+    similarity.diferencas.forEach((item, idx) => {
+      doc.text(`• ${item}`, 18, y);
+      y += 8;
+    });
+  }
+
+  if (similarity.fase_construcao) {
+    doc.text(`Fase da construção: ${similarity.fase_construcao}`, 14, 140);
+  }
+
+  doc.save("relatorio-diferencas.pdf");
+}
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -209,7 +241,8 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
                 {similarity.progresso}%
               </div>
             </div>
-            <button style={{top:"24px", right:"24px", position:"absolute"}}>
+            {/* Botão de exportar */}
+            <button onClick={exportPDF} style={{top:"24px", right:"24px", position:"absolute"}}>
               <CiExport size={"30px"}/>
             </button>
             {/* Diferenças */}

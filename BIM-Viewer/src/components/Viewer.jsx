@@ -129,35 +129,72 @@ export default function Viewer({ urn, imageUrl, screenshotUrl, setScreenshotUrl 
   }
 
   function exportPDF() {
-  if (!similarity) {
-    alert("Nenhum resultado para exportar!");
-    return;
+    if (!similarity) {
+      alert("Nenhum resultado para exportar!");
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    // Margens da página
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 15;
+
+    // Caixa (card)
+    const boxX = margin;
+    const boxY = 20;
+    const boxWidth = pageWidth - margin * 2;
+    let boxHeight = 0; // será calculado
+
+    let cursorY = boxY + 15;
+
+    // Título
+    doc.setFontSize(18);
+    doc.text("Relatório de Diferenças", boxX + 10, cursorY);
+    cursorY += 15;
+
+    // Similaridade
+    doc.setFontSize(14);
+    doc.text(`Similaridade: ${similarity.progresso}%`, boxX + 10, cursorY);
+    cursorY += 12;
+
+    // Diferenças
+    if (similarity.diferencas && similarity.diferencas.length > 0) {
+      doc.text("Diferenças encontradas:", boxX + 10, cursorY);
+      cursorY += 10;
+
+      doc.setFontSize(12);
+
+      similarity.diferencas.forEach((item) => {
+        const splitText = doc.splitTextToSize(`• ${item}`, boxWidth - 25);
+        doc.text(splitText, boxX + 15, cursorY);
+        cursorY += splitText.length * 7;
+      });
+    }
+
+    cursorY += 5;
+
+    // Fase da construção
+    if (similarity.fase_construcao) {
+      doc.setFontSize(14);
+      doc.text(
+        `Fase da construção: ${similarity.fase_construcao}`,
+        boxX + 10,
+        cursorY
+      );
+
+      cursorY += 20;
+    }
+
+    // Calcula a altura final da caixa
+    boxHeight = cursorY - boxY;
+
+    // Desenha o card
+    doc.setLineWidth(1.2);
+    doc.roundedRect(boxX, boxY, boxWidth, boxHeight, 5, 5);
+
+    doc.save("relatorio-diferencas.pdf");
   }
-
-  const doc = new jsPDF();
-
-  doc.setFontSize(18);
-  doc.text("Relatório de Diferenças", 14, 20);
-
-  doc.setFontSize(14);
-  doc.text(`Similaridade: ${similarity.progresso}%`, 14, 35);
-
-  if (similarity.diferencas && similarity.diferencas.length > 0) {
-    doc.text("Diferenças encontradas:", 14, 50);
-
-    let y = 58;
-    similarity.diferencas.forEach((item, idx) => {
-      doc.text(`• ${item}`, 18, y);
-      y += 8;
-    });
-  }
-
-  if (similarity.fase_construcao) {
-    doc.text(`Fase da construção: ${similarity.fase_construcao}`, 14, 140);
-  }
-
-  doc.save("relatorio-diferencas.pdf");
-}
 
   return (
     <motion.div
